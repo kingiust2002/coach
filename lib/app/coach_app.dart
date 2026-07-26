@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -25,7 +27,7 @@ class _CoachAppState extends State<CoachApp> {
   void initState() {
     super.initState();
     _athletesController = AthletesController(widget.athleteRepository);
-    _athletesController.load();
+    unawaited(_athletesController.load());
   }
 
   @override
