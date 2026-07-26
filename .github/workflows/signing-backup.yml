@@ -1,0 +1,64 @@
+name: Generate Android Signing Backup
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  generate-signing-backup:
+    if: github.head_ref == 'agent/add-ios-signing'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate private Android upload key
+        shell: bash
+        run: |
+          set +x
+          mkdir -p signing-backup
+          PASSWORD="$(openssl rand -base64 36 | tr -d '\n/=+' | cut -c1-30)"
+          keytool -genkeypair -v \
+            -keystore signing-backup/coach-upload.jks \
+            -storetype JKS \
+            -keyalg RSA \
+            -keysize 4096 \
+            -validity 10000 \
+            -alias coach-upload \
+            -storepass "$PASSWORD" \
+            -keypass "$PASSWORD" \
+            -dname "CN=Coach App, OU=Mobile, O=Kingiust"
+
+          cat > signing-backup/key.properties <<EOF
+          storePassword=$PASSWORD
+          keyPassword=$PASSWORD
+          keyAlias=coach-upload
+          storeFile=../keystore/coach-upload.jks
+          EOF
+
+          cat > signing-backup/README-FA.txt <<'EOF'
+          بسته خصوصی امضای Android اپ Coach
+
+          Package/Application ID: com.kingiust.coach
+
+          این فایل‌ها را در حداقل دو محل امن و آفلاین نگه دارید.
+          هیچ‌کدام را داخل GitHub، پیام‌رسان یا فضای عمومی قرار ندهید.
+          برای تمام نسخه‌های آینده دقیقاً از همین keystore و alias استفاده کنید.
+
+          مسیر پیشنهادی در پروژه:
+          android/keystore/coach-upload.jks
+          android/key.properties
+          EOF
+
+      - name: Upload private signing backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: coach-android-signing-backup
+          path: signing-backup/
+          if-no-files-found: error
+          retention-days: 7
