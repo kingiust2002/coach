@@ -86,7 +86,7 @@ class _AthleteFormPageState extends State<AthleteFormPage> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<TrainingLevel>(
-              value: _level,
+              initialValue: _level,
               decoration: const InputDecoration(
                 labelText: 'سطح تمرینی',
                 prefixIcon: Icon(Icons.signal_cellular_alt),
