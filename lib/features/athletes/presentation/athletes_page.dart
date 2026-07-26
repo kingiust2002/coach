@@ -96,7 +96,9 @@ class _AthletesPageState extends State<AthletesPage> {
       child: ListView.separated(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
         itemCount: athletes.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
+        separatorBuilder: (BuildContext context, int index) {
+          return const SizedBox(height: 10);
+        },
         itemBuilder: (BuildContext context, int index) {
           final Athlete athlete = athletes[index];
           return Card(
