@@ -43,11 +43,27 @@ class AppDatabase {
     int oldVersion,
     int newVersion,
   ) async {
-    for (int version = oldVersion + 1; version <= newVersion; version++) {
-      switch (version) {
-        default:
-          throw StateError('Migration for database version $version is missing.');
-      }
+    for (
+      int targetVersion = oldVersion + 1;
+      targetVersion <= newVersion;
+      targetVersion++
+    ) {
+      await _migrateTo(db, targetVersion);
+    }
+  }
+
+  Future<void> _migrateTo(Database db, int targetVersion) async {
+    switch (targetVersion) {
+      case 1:
+        await db.transaction((Transaction txn) async {
+          await txn.execute(DatabaseSchema.createAthletes);
+          await txn.execute(DatabaseSchema.athletesActiveIndex);
+        });
+        return;
+      default:
+        throw StateError(
+          'Migration for database version $targetVersion is missing.',
+        );
     }
   }
 
