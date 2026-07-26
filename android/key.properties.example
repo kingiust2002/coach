@@ -1,0 +1,6 @@
+# Copy this file to android/key.properties and keep the real file private.
+# The keystore path is resolved from android/app.
+storePassword=CHANGE_ME
+keyPassword=CHANGE_ME
+keyAlias=coach-upload
+storeFile=../keystore/coach-upload.jks

@@ -1,4 +1,4 @@
-package com.kingiust.coach_app
+package com.kingiust.coach
 
 import io.flutter.embedding.android.FlutterActivity
 
