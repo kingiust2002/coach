@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   generate:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 25
 
     steps:
