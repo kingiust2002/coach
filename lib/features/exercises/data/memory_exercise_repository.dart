@@ -21,11 +21,15 @@ class MemoryExerciseRepository implements ExerciseRepository {
         .where((Exercise item) => includeArchived || item.isActive)
         .toList();
     result.sort((Exercise a, Exercise b) {
-      final int activeOrder = (b.isActive ? 1 : 0).compareTo(a.isActive ? 1 : 0);
+      final int activeOrder = (b.isActive ? 1 : 0).compareTo(
+        a.isActive ? 1 : 0,
+      );
       if (activeOrder != 0) {
         return activeOrder;
       }
-      final int systemOrder = (b.isSystem ? 1 : 0).compareTo(a.isSystem ? 1 : 0);
+      final int systemOrder = (b.isSystem ? 1 : 0).compareTo(
+        a.isSystem ? 1 : 0,
+      );
       if (systemOrder != 0) {
         return systemOrder;
       }

@@ -12,7 +12,9 @@ class MemoryAthleteRepository implements AthleteRepository {
         .where((Athlete item) => includeArchived || item.isActive)
         .toList();
     result.sort((Athlete a, Athlete b) {
-      final int activeOrder = (b.isActive ? 1 : 0).compareTo(a.isActive ? 1 : 0);
+      final int activeOrder = (b.isActive ? 1 : 0).compareTo(
+        a.isActive ? 1 : 0,
+      );
       if (activeOrder != 0) {
         return activeOrder;
       }

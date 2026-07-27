@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'app_dependencies.dart';
 import 'app_dependencies_mobile.dart'
-    if (dart.library.html) 'app_dependencies_web.dart' as platform;
+    if (dart.library.html) 'app_dependencies_web.dart'
+    as platform;
 import 'coach_app.dart';
 
 class AppBootstrap extends StatefulWidget {
@@ -27,10 +28,7 @@ class _AppBootstrapState extends State<AppBootstrap> {
   Widget build(BuildContext context) {
     return FutureBuilder<AppDependencies>(
       future: _initialization,
-      builder: (
-        BuildContext context,
-        AsyncSnapshot<AppDependencies> snapshot,
-      ) {
+      builder: (BuildContext context, AsyncSnapshot<AppDependencies> snapshot) {
         final AppDependencies? dependencies = snapshot.data;
         if (dependencies != null) {
           return CoachApp(
@@ -41,10 +39,7 @@ class _AppBootstrapState extends State<AppBootstrap> {
 
         if (snapshot.hasError) {
           return _BootstrapFrame(
-            child: _StartupError(
-              error: snapshot.error,
-              onRetry: _retry,
-            ),
+            child: _StartupError(error: snapshot.error, onRetry: _retry),
           );
         }
 

@@ -57,10 +57,7 @@ class AppDatabase {
     }
   }
 
-  Future<void> _migrateTo(
-    DatabaseExecutor executor,
-    int targetVersion,
-  ) async {
+  Future<void> _migrateTo(DatabaseExecutor executor, int targetVersion) async {
     switch (targetVersion) {
       case 1:
         await _createAthletes(executor);
