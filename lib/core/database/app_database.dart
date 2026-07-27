@@ -29,10 +29,8 @@ class AppDatabase {
       },
       onCreate: (Database db, int version) async {
         await db.transaction((Transaction txn) async {
-          await txn.execute(DatabaseSchema.createAthletes);
-          await txn.execute(DatabaseSchema.athletesActiveIndex);
-          await txn.execute(DatabaseSchema.athletesStatusUpdatedIndex);
-          await txn.execute(DatabaseSchema.athletesPhoneIndex);
+          await _createAthletes(txn);
+          await _createExercises(txn);
         });
       },
       onUpgrade: _upgrade,
@@ -60,12 +58,7 @@ class AppDatabase {
   Future<void> _migrateTo(Database db, int targetVersion) async {
     switch (targetVersion) {
       case 1:
-        await db.transaction((Transaction txn) async {
-          await txn.execute(DatabaseSchema.createAthletes);
-          await txn.execute(DatabaseSchema.athletesActiveIndex);
-          await txn.execute(DatabaseSchema.athletesStatusUpdatedIndex);
-          await txn.execute(DatabaseSchema.athletesPhoneIndex);
-        });
+        await db.transaction(_createAthletes);
         return;
       case 2:
         await db.transaction((Transaction txn) async {
@@ -74,10 +67,34 @@ class AppDatabase {
           }
         });
         return;
+      case 3:
+        await db.transaction(_createExercises);
+        return;
       default:
         throw StateError(
           'Migration for database version $targetVersion is missing.',
         );
+    }
+  }
+
+  static Future<void> _createAthletes(Transaction txn) async {
+    await txn.execute(DatabaseSchema.createAthletes);
+    await txn.execute(DatabaseSchema.athletesActiveIndex);
+    await txn.execute(DatabaseSchema.athletesStatusUpdatedIndex);
+    await txn.execute(DatabaseSchema.athletesPhoneIndex);
+  }
+
+  static Future<void> _createExercises(Transaction txn) async {
+    for (final String statement in DatabaseSchema.migrateToV3) {
+      await txn.execute(statement);
+    }
+    for (final Map<String, Object?> seed
+        in DatabaseSchema.systemExerciseSeeds) {
+      await txn.insert(
+        DatabaseSchema.exercises,
+        seed,
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
     }
   }
 
