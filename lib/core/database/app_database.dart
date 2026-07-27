@@ -25,7 +25,6 @@ class AppDatabase {
       singleInstance: true,
       onConfigure: (Database db) async {
         await db.execute('PRAGMA foreign_keys = ON');
-        await db.execute('PRAGMA busy_timeout = 5000');
       },
       onCreate: (Database db, int version) async {
         // sqflite already wraps onCreate in a transaction. Starting another
