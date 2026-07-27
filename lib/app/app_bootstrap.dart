@@ -1,14 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-import '../core/database/app_database.dart';
-import '../features/athletes/data/athlete_repository.dart';
-import '../features/athletes/data/memory_athlete_repository.dart';
-import '../features/athletes/data/sqlite_athlete_repository.dart';
-import '../features/exercises/data/exercise_repository.dart';
-import '../features/exercises/data/memory_exercise_repository.dart';
-import '../features/exercises/data/sqlite_exercise_repository.dart';
+import 'app_dependencies.dart';
+import 'app_dependencies_mobile.dart'
+    if (dart.library.html) 'app_dependencies_web.dart' as platform;
 import 'coach_app.dart';
 
 class AppBootstrap extends StatefulWidget {
@@ -19,28 +13,9 @@ class AppBootstrap extends StatefulWidget {
 }
 
 class _AppBootstrapState extends State<AppBootstrap> {
-  late Future<_AppDependencies> _initialization = _initialize();
+  late Future<AppDependencies> _initialization = _initialize();
 
-  Future<_AppDependencies> _initialize() async {
-    if (kIsWeb) {
-      return _AppDependencies(
-        athleteRepository: MemoryAthleteRepository(),
-        exerciseRepository: MemoryExerciseRepository(),
-      );
-    }
-
-    await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
-
-    final AppDatabase database = AppDatabase.instance;
-    await database.open();
-    return _AppDependencies(
-      athleteRepository: SqliteAthleteRepository(database),
-      exerciseRepository: SqliteExerciseRepository(database),
-    );
-  }
+  Future<AppDependencies> _initialize() => platform.createAppDependencies();
 
   void _retry() {
     setState(() {
@@ -50,13 +25,13 @@ class _AppBootstrapState extends State<AppBootstrap> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<_AppDependencies>(
+    return FutureBuilder<AppDependencies>(
       future: _initialization,
       builder: (
         BuildContext context,
-        AsyncSnapshot<_AppDependencies> snapshot,
+        AsyncSnapshot<AppDependencies> snapshot,
       ) {
-        final _AppDependencies? dependencies = snapshot.data;
+        final AppDependencies? dependencies = snapshot.data;
         if (dependencies != null) {
           return CoachApp(
             athleteRepository: dependencies.athleteRepository,
@@ -77,16 +52,6 @@ class _AppBootstrapState extends State<AppBootstrap> {
       },
     );
   }
-}
-
-class _AppDependencies {
-  const _AppDependencies({
-    required this.athleteRepository,
-    required this.exerciseRepository,
-  });
-
-  final AthleteRepository athleteRepository;
-  final ExerciseRepository exerciseRepository;
 }
 
 class _BootstrapFrame extends StatelessWidget {
