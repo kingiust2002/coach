@@ -59,9 +59,7 @@ abstract final class AppTheme {
         color: scheme.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(22),
-          side: BorderSide(
-            color: scheme.outlineVariant.withValues(alpha: 0.8),
-          ),
+          side: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.8)),
         ),
       ),
       appBarTheme: AppBarTheme(
