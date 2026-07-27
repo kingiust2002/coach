@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write
+  contents: read
   issues: write
   pull-requests: write
 
@@ -19,27 +19,6 @@ env:
   FLUTTER_VERSION: 3.32.6
 
 jobs:
-  fix-phase2:
-    if: github.event_name == 'pull_request' && github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Checkout working branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-
-      - name: Fix generic const creation
-        shell: bash
-        run: |
-          sed -i "s/const DropdownMenuItem<T?>(value: null, child: Text('همه'))/DropdownMenuItem<T?>(value: null, child: const Text('همه'))/" lib/features/exercises/presentation/exercises_page.dart
-          rm -f docs/PHASE2_ANALYZE.log
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add lib/features/exercises/presentation/exercises_page.dart docs/PHASE2_ANALYZE.log
-          git commit -m "fix: remove invalid generic const creation"
-          git push origin HEAD:${{ github.event.pull_request.head.ref }}
-
   android-verify:
     runs-on: ubuntu-latest
     timeout-minutes: 30
