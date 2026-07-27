@@ -1,0 +1,43 @@
+name: Format Phase 1 Final
+
+on:
+  push:
+    branches:
+      - coach-flutlab-v4-0727
+
+permissions:
+  contents: write
+
+concurrency:
+  group: format-phase-1-final
+  cancel-in-progress: true
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout working branch
+        uses: actions/checkout@v4
+        with:
+          ref: coach-flutlab-v4-0727
+
+      - name: Set up Flutter 3.32.6
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.32.6
+          channel: stable
+          cache: true
+
+      - name: Format Dart sources
+        run: dart format lib test
+
+      - name: Commit and self-remove
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/format-phase1-final.yml
+          git add lib test .github/workflows/format-phase1-final.yml
+          git commit -m "style: apply final Flutter 3.32 formatting"
+          git push origin HEAD:coach-flutlab-v4-0727
