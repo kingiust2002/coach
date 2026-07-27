@@ -1,0 +1,46 @@
+name: Format Phase 1
+
+on:
+  push:
+    branches:
+      - coach-flutlab-v4-0727
+
+permissions:
+  contents: write
+
+concurrency:
+  group: format-phase-1
+  cancel-in-progress: true
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout working branch
+        uses: actions/checkout@v4
+        with:
+          ref: coach-flutlab-v4-0727
+
+      - name: Set up Flutter 3.32.6
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.32.6
+          channel: stable
+          cache: true
+
+      - name: Format Dart sources
+        run: dart format lib test
+
+      - name: Commit formatting and remove one-time workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/format-phase1.yml
+          git add lib test .github/workflows/format-phase1.yml
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "style: format phase 1 sources with Flutter 3.32.6"
+          git push origin HEAD:coach-flutlab-v4-0727
