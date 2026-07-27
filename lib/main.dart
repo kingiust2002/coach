@@ -1,26 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-import 'app/coach_app.dart';
-import 'core/database/app_database.dart';
-import 'features/athletes/data/sqlite_athlete_repository.dart';
-import 'features/exercises/data/sqlite_exercise_repository.dart';
+import 'app/app_bootstrap.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
-
-  final AppDatabase database = AppDatabase.instance;
-  await database.open();
-
-  runApp(
-    CoachApp(
-      athleteRepository: SqliteAthleteRepository(database),
-      exerciseRepository: SqliteExerciseRepository(database),
-    ),
-  );
+  runApp(const AppBootstrap());
 }
