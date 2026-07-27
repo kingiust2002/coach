@@ -4,7 +4,8 @@ abstract final class DatabaseSchema {
 
   static const String athletes = 'athletes';
 
-  static const String createAthletes = '''
+  static const String createAthletes =
+      '''
 CREATE TABLE $athletes (
   id TEXT PRIMARY KEY,
   full_name TEXT NOT NULL,
@@ -19,7 +20,8 @@ CREATE TABLE $athletes (
 )
 ''';
 
-  static const String athletesActiveIndex = '''
+  static const String athletesActiveIndex =
+      '''
 CREATE INDEX idx_athletes_active_name
 ON $athletes (is_active, full_name)
 ''';

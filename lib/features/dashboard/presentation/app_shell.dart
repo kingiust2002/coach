@@ -4,10 +4,7 @@ import '../../athletes/presentation/athletes_controller.dart';
 import '../../athletes/presentation/athletes_page.dart';
 
 class AppShell extends StatefulWidget {
-  const AppShell({
-    required this.controller,
-    super.key,
-  });
+  const AppShell({required this.controller, super.key});
 
   final AthletesController controller;
 
@@ -36,7 +33,9 @@ class _AppShellState extends State<AppShell> {
     ];
 
     return Scaffold(
-      body: SafeArea(child: IndexedStack(index: _index, children: pages)),
+      body: SafeArea(
+        child: IndexedStack(index: _index, children: pages),
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (int value) => setState(() => _index = value),
@@ -82,9 +81,9 @@ class _Dashboard extends StatelessWidget {
           children: <Widget>[
             Text(
               'مربی‌یار',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 6),
             Text(
@@ -133,9 +132,9 @@ class _StatCard extends StatelessWidget {
             Expanded(child: Text(title)),
             Text(
               value,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
             ),
           ],
         ),

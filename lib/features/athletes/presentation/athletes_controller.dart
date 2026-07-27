@@ -16,7 +16,8 @@ class AthletesController extends ChangeNotifier {
   List<Athlete> get athletes => List<Athlete>.unmodifiable(_athletes);
   bool get isLoading => _isLoading;
   Object? get error => _error;
-  int get activeCount => _athletes.where((Athlete item) => item.isActive).length;
+  int get activeCount =>
+      _athletes.where((Athlete item) => item.isActive).length;
 
   Future<void> load() async {
     _setLoading(true);
@@ -60,9 +61,7 @@ class AthletesController extends ChangeNotifier {
   }
 
   Future<void> update(Athlete athlete) async {
-    await _repository.save(
-      athlete.copyWith(updatedAt: DateTime.now().toUtc()),
-    );
+    await _repository.save(athlete.copyWith(updatedAt: DateTime.now().toUtc()));
     await load();
   }
 

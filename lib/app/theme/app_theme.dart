@@ -9,9 +9,9 @@ abstract final class AppTheme {
       brightness: Brightness.light,
     );
 
-    return _base(scheme).copyWith(
-      scaffoldBackgroundColor: const Color(0xFFF6F8F7),
-    );
+    return _base(
+      scheme,
+    ).copyWith(scaffoldBackgroundColor: const Color(0xFFF6F8F7));
   }
 
   static ThemeData dark() {

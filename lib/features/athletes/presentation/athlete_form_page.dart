@@ -4,11 +4,7 @@ import '../domain/athlete.dart';
 import 'athletes_controller.dart';
 
 class AthleteFormPage extends StatefulWidget {
-  const AthleteFormPage({
-    required this.controller,
-    this.athlete,
-    super.key,
-  });
+  const AthleteFormPage({required this.controller, this.athlete, super.key});
 
   final AthletesController controller;
   final Athlete? athlete;

@@ -16,9 +16,5 @@ Future<void> main() async {
   final AppDatabase database = AppDatabase.instance;
   await database.open();
 
-  runApp(
-    CoachApp(
-      athleteRepository: SqliteAthleteRepository(database),
-    ),
-  );
+  runApp(CoachApp(athleteRepository: SqliteAthleteRepository(database)));
 }
