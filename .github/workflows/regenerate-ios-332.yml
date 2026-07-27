@@ -1,0 +1,54 @@
+name: Regenerate iOS for Flutter 3.32.6
+
+on:
+  push:
+    branches:
+      - agent/regenerate-ios-332
+
+permissions:
+  contents: write
+
+concurrency:
+  group: regenerate-ios-332
+  cancel-in-progress: true
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/regenerate-ios-332
+
+      - name: Set up Flutter 3.32.6
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.32.6
+          channel: stable
+          cache: true
+
+      - name: Regenerate iOS platform
+        run: |
+          rm -rf ios
+          flutter create . --platforms=ios --org com.kingiust --project-name coach_app
+          python3 - <<'PY'
+          from pathlib import Path
+
+          project = Path('ios/Runner.xcodeproj/project.pbxproj')
+          text = project.read_text(encoding='utf-8')
+          text = text.replace('com.kingiust.coachApp.RunnerTests', 'com.kingiust.coach.RunnerTests')
+          text = text.replace('com.kingiust.coachApp', 'com.kingiust.coach')
+          project.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit generated platform and remove one-time workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/regenerate-ios-332.yml
+          git add ios .metadata .github/workflows/regenerate-ios-332.yml
+          git commit -m "fix: regenerate iOS platform with Flutter 3.32.6"
+          git push origin HEAD:agent/regenerate-ios-332
