@@ -22,16 +22,25 @@ class AppDatabase {
     final Database database = await openDatabase(
       path,
       version: DatabaseSchema.version,
+      singleInstance: true,
       onConfigure: (Database db) async {
         await db.execute('PRAGMA foreign_keys = ON');
+        await db.execute('PRAGMA busy_timeout = 5000');
       },
       onCreate: (Database db, int version) async {
         await db.transaction((Transaction txn) async {
           await txn.execute(DatabaseSchema.createAthletes);
           await txn.execute(DatabaseSchema.athletesActiveIndex);
+          await txn.execute(DatabaseSchema.athletesStatusUpdatedIndex);
+          await txn.execute(DatabaseSchema.athletesPhoneIndex);
         });
       },
       onUpgrade: _upgrade,
+      onDowngrade: (Database db, int oldVersion, int newVersion) async {
+        throw StateError(
+          'Database downgrade from $oldVersion to $newVersion is not supported.',
+        );
+      },
     );
 
     _database = database;
@@ -54,6 +63,15 @@ class AppDatabase {
         await db.transaction((Transaction txn) async {
           await txn.execute(DatabaseSchema.createAthletes);
           await txn.execute(DatabaseSchema.athletesActiveIndex);
+          await txn.execute(DatabaseSchema.athletesStatusUpdatedIndex);
+          await txn.execute(DatabaseSchema.athletesPhoneIndex);
+        });
+        return;
+      case 2:
+        await db.transaction((Transaction txn) async {
+          for (final String statement in DatabaseSchema.migrateAthletesToV2) {
+            await txn.execute(statement);
+          }
         });
         return;
       default:
