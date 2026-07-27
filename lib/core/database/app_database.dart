@@ -22,16 +22,23 @@ class AppDatabase {
     final Database database = await openDatabase(
       path,
       version: DatabaseSchema.version,
+      singleInstance: true,
       onConfigure: (Database db) async {
         await db.execute('PRAGMA foreign_keys = ON');
+        await db.execute('PRAGMA busy_timeout = 5000');
       },
       onCreate: (Database db, int version) async {
         await db.transaction((Transaction txn) async {
-          await txn.execute(DatabaseSchema.createAthletes);
-          await txn.execute(DatabaseSchema.athletesActiveIndex);
+          await _createAthletes(txn);
+          await _createExercises(txn);
         });
       },
       onUpgrade: _upgrade,
+      onDowngrade: (Database db, int oldVersion, int newVersion) async {
+        throw StateError(
+          'Database downgrade from $oldVersion to $newVersion is not supported.',
+        );
+      },
     );
 
     _database = database;
@@ -51,15 +58,43 @@ class AppDatabase {
   Future<void> _migrateTo(Database db, int targetVersion) async {
     switch (targetVersion) {
       case 1:
+        await db.transaction(_createAthletes);
+        return;
+      case 2:
         await db.transaction((Transaction txn) async {
-          await txn.execute(DatabaseSchema.createAthletes);
-          await txn.execute(DatabaseSchema.athletesActiveIndex);
+          for (final String statement in DatabaseSchema.migrateAthletesToV2) {
+            await txn.execute(statement);
+          }
         });
+        return;
+      case 3:
+        await db.transaction(_createExercises);
         return;
       default:
         throw StateError(
           'Migration for database version $targetVersion is missing.',
         );
+    }
+  }
+
+  static Future<void> _createAthletes(Transaction txn) async {
+    await txn.execute(DatabaseSchema.createAthletes);
+    await txn.execute(DatabaseSchema.athletesActiveIndex);
+    await txn.execute(DatabaseSchema.athletesStatusUpdatedIndex);
+    await txn.execute(DatabaseSchema.athletesPhoneIndex);
+  }
+
+  static Future<void> _createExercises(Transaction txn) async {
+    for (final String statement in DatabaseSchema.migrateToV3) {
+      await txn.execute(statement);
+    }
+    for (final Map<String, Object?> seed
+        in DatabaseSchema.systemExerciseSeeds) {
+      await txn.insert(
+        DatabaseSchema.exercises,
+        seed,
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
     }
   }
 

@@ -2,11 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../../athletes/presentation/athletes_controller.dart';
 import '../../athletes/presentation/athletes_page.dart';
+import '../../exercises/presentation/exercises_controller.dart';
+import '../../exercises/presentation/exercises_page.dart';
 
 class AppShell extends StatefulWidget {
-  const AppShell({required this.controller, super.key});
+  const AppShell({
+    required this.athletesController,
+    required this.exercisesController,
+    super.key,
+  });
 
-  final AthletesController controller;
+  final AthletesController athletesController;
+  final ExercisesController exercisesController;
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -18,11 +25,18 @@ class _AppShellState extends State<AppShell> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> pages = <Widget>[
-      _Dashboard(controller: widget.controller),
-      AthletesPage(controller: widget.controller),
+      _Dashboard(
+        athletesController: widget.athletesController,
+        exercisesController: widget.exercisesController,
+        openAthletes: () => setState(() => _index = 1),
+        openExercises: () => setState(() => _index = 2),
+      ),
+      AthletesPage(controller: widget.athletesController),
+      ExercisesPage(controller: widget.exercisesController),
       const _ComingSoon(
         title: 'برنامه‌ها',
-        description: 'برنامه‌ساز نسخه‌دار در مرحله بعد اضافه می‌شود.',
+        description:
+            'پس از تکمیل ارزیابی شاگرد، برنامه‌ساز Draft به کتابخانه حرکات متصل می‌شود.',
         icon: Icons.assignment_outlined,
       ),
       const _ComingSoon(
@@ -51,6 +65,11 @@ class _AppShellState extends State<AppShell> {
             label: 'شاگردان',
           ),
           NavigationDestination(
+            icon: Icon(Icons.fitness_center_outlined),
+            selectedIcon: Icon(Icons.fitness_center),
+            label: 'حرکات',
+          ),
+          NavigationDestination(
             icon: Icon(Icons.assignment_outlined),
             selectedIcon: Icon(Icons.assignment),
             label: 'برنامه‌ها',
@@ -67,14 +86,25 @@ class _AppShellState extends State<AppShell> {
 }
 
 class _Dashboard extends StatelessWidget {
-  const _Dashboard({required this.controller});
+  const _Dashboard({
+    required this.athletesController,
+    required this.exercisesController,
+    required this.openAthletes,
+    required this.openExercises,
+  });
 
-  final AthletesController controller;
+  final AthletesController athletesController;
+  final ExercisesController exercisesController;
+  final VoidCallback openAthletes;
+  final VoidCallback openExercises;
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: controller,
+      animation: Listenable.merge(<Listenable>[
+        athletesController,
+        exercisesController,
+      ]),
       builder: (BuildContext context, Widget? child) {
         return ListView(
           padding: const EdgeInsets.all(20),
@@ -87,20 +117,42 @@ class _Dashboard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'مدیریت دقیق شاگردها و برنامه‌های تمرینی',
+              'مدیریت دقیق شاگردها، حرکات و برنامه‌های تمرینی',
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 24),
-            _StatCard(
-              icon: Icons.groups_2_outlined,
-              title: 'شاگرد فعال',
-              value: controller.activeCount.toString(),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: _StatCard(
+                    icon: Icons.groups_2_outlined,
+                    title: 'شاگرد فعال',
+                    value: athletesController.activeCount.toString(),
+                    onTap: openAthletes,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _StatCard(
+                    icon: Icons.fitness_center_rounded,
+                    title: 'حرکت فعال',
+                    value: exercisesController.activeCount.toString(),
+                    onTap: openExercises,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _InfoCard(
+              title: 'کتابخانه حرکات آماده برنامه‌ساز است',
+              description:
+                  '${exercisesController.systemCount} حرکت سیستمی و ${exercisesController.customCount} حرکت سفارشی با شناسه پایدار در دسترس است. حرکت بایگانی‌شده حذف نمی‌شود و ارجاع برنامه‌های آینده را حفظ می‌کند.',
             ),
             const SizedBox(height: 16),
             const _InfoCard(
-              title: 'پایه آفلاین فعال است',
+              title: 'چرخه محصول',
               description:
-                  'اطلاعات روی دستگاه ذخیره می‌شود. نسخه‌بندی و تبادل فایل در مراحل بعد روی همین هسته اضافه خواهد شد.',
+                  'شاگرد ← ارزیابی ← انتخاب حرکت ← برنامه ← اجرا ← گزارش ← بازبینی',
             ),
           ],
         );
@@ -114,29 +166,35 @@ class _StatCard extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.value,
+    required this.onTap,
   });
 
   final IconData icon;
   final String title;
   final String value;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          children: <Widget>[
-            CircleAvatar(radius: 26, child: Icon(icon)),
-            const SizedBox(width: 16),
-            Expanded(child: Text(title)),
-            Text(
-              value,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
-            ),
-          ],
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              CircleAvatar(radius: 23, child: Icon(icon)),
+              const SizedBox(height: 14),
+              Text(
+                value,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              Text(title),
+            ],
+          ),
         ),
       ),
     );

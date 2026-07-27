@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'app/coach_app.dart';
 import 'core/database/app_database.dart';
 import 'features/athletes/data/sqlite_athlete_repository.dart';
+import 'features/exercises/data/sqlite_exercise_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,5 +17,10 @@ Future<void> main() async {
   final AppDatabase database = AppDatabase.instance;
   await database.open();
 
-  runApp(CoachApp(athleteRepository: SqliteAthleteRepository(database)));
+  runApp(
+    CoachApp(
+      athleteRepository: SqliteAthleteRepository(database),
+      exerciseRepository: SqliteExerciseRepository(database),
+    ),
+  );
 }
