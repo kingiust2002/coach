@@ -1,5 +1,6 @@
 import 'package:coach_app/core/database/database_schema.dart';
 import 'package:coach_app/features/athletes/domain/athlete.dart';
+import 'package:coach_app/features/exercises/domain/exercise.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -102,6 +103,80 @@ CREATE TABLE ${DatabaseSchema.athletes} (
     expect(indexNames, contains('idx_athletes_active_name'));
     expect(indexNames, contains('idx_athletes_status_updated'));
     expect(indexNames, contains('idx_athletes_phone'));
+  });
+
+  test('v3 migration preserves athletes and seeds exercise catalog', () async {
+    final Database database = await databaseFactoryFfi.openDatabase(
+      inMemoryDatabasePath,
+    );
+    addTearDown(database.close);
+
+    await database.execute(DatabaseSchema.createAthletes);
+    await database.execute(DatabaseSchema.athletesActiveIndex);
+    await database.execute(DatabaseSchema.athletesStatusUpdatedIndex);
+    await database.execute(DatabaseSchema.athletesPhoneIndex);
+    const String timestamp = '2026-07-27T08:00:00.000Z';
+    await database.insert(DatabaseSchema.athletes, <String, Object?>{
+      'id': 'ath-v2-1',
+      'full_name': 'شاگرد نسخه دو',
+      'phone': '',
+      'birth_date': null,
+      'primary_goal': 'generalFitness',
+      'goal': '',
+      'training_level': 'beginner',
+      'experience_months': 0,
+      'preferred_days_per_week': 3,
+      'preferred_session_minutes': 60,
+      'training_environment': 'gym',
+      'injuries': '',
+      'medical_notes': '',
+      'notes': '',
+      'is_active': 1,
+      'archived_at': null,
+      'created_at': timestamp,
+      'updated_at': timestamp,
+    });
+
+    await database.transaction((Transaction transaction) async {
+      for (final String statement in DatabaseSchema.migrateToV3) {
+        await transaction.execute(statement);
+      }
+      for (final Map<String, Object?> seed
+          in DatabaseSchema.systemExerciseSeeds) {
+        await transaction.insert(DatabaseSchema.exercises, seed);
+      }
+    });
+
+    final List<Map<String, Object?>> athleteRows = await database.query(
+      DatabaseSchema.athletes,
+      where: 'id = ?',
+      whereArgs: <Object?>['ath-v2-1'],
+    );
+    expect(athleteRows, hasLength(1));
+    expect(Athlete.fromMap(athleteRows.single).fullName, 'شاگرد نسخه دو');
+
+    final List<Map<String, Object?>> exerciseRows = await database.query(
+      DatabaseSchema.exercises,
+      orderBy: 'name_fa ASC',
+    );
+    expect(
+      exerciseRows.length,
+      DatabaseSchema.systemExerciseSeeds.length,
+    );
+    final Exercise exercise = Exercise.fromMap(exerciseRows.first);
+    expect(exercise.isSystem, isTrue);
+    expect(exercise.isActive, isTrue);
+    expect(exercise.nameFa, isNotEmpty);
+
+    final List<Map<String, Object?>> indexes = await database.rawQuery(
+      'PRAGMA index_list(${DatabaseSchema.exercises})',
+    );
+    final Set<String> indexNames = indexes
+        .map((Map<String, Object?> item) => item['name']! as String)
+        .toSet();
+    expect(indexNames, contains('idx_exercises_filters'));
+    expect(indexNames, contains('idx_exercises_name'));
+    expect(indexNames, contains('idx_exercises_system_active'));
   });
 
   test('v2 migration is atomic when a statement fails', () async {
