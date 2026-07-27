@@ -1,0 +1,102 @@
+name: Fix Phase 1 Analyzer
+
+on:
+  push:
+    branches:
+      - coach-flutlab-v4-0727
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fix-phase-1-analyzer
+  cancel-in-progress: true
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout working branch
+        uses: actions/checkout@v4
+        with:
+          ref: coach-flutlab-v4-0727
+
+      - name: Set up Flutter 3.32.6
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.32.6
+          channel: stable
+          cache: true
+
+      - name: Apply compatible API migrations
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          changed_opacity = 0
+          for path in Path('lib').rglob('*.dart'):
+              text = path.read_text(encoding='utf-8')
+              updated = text.replace('.withOpacity(', '.withValues(alpha: ')
+              if updated != text:
+                  changed_opacity += text.count('.withOpacity(')
+                  path.write_text(updated, encoding='utf-8')
+
+          theme = Path('lib/app/theme/app_theme.dart')
+          text = theme.read_text(encoding='utf-8')
+          old_theme = 'cardTheme: CardTheme('
+          if old_theme not in text:
+              raise SystemExit('Expected CardTheme pattern was not found.')
+          theme.write_text(
+              text.replace(old_theme, 'cardTheme: CardThemeData(', 1),
+              encoding='utf-8',
+          )
+
+          form = Path('lib/features/athletes/presentation/athlete_form_page.dart')
+          text = form.read_text(encoding='utf-8')
+          old_pop = '''return WillPopScope(
+                onWillPop: _confirmDiscard,
+                child: Scaffold('''
+          if old_pop not in text:
+              old_pop = '''return WillPopScope(
+              onWillPop: _confirmDiscard,
+              child: Scaffold('''
+          if old_pop not in text:
+              old_pop = '''return WillPopScope(
+      onWillPop: _confirmDiscard,
+      child: Scaffold('''
+          if old_pop not in text:
+              raise SystemExit('Expected WillPopScope pattern was not found.')
+          indent = old_pop.split('onWillPop:')[0].split('return WillPopScope(')[1]
+          new_pop = '''return PopScope<Object?>(
+      canPop: !_dirty,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop || _saving || !_dirty) {
+          return;
+        }
+        final bool discard = await _confirmDiscard();
+        if (discard && mounted) {
+          setState(() => _dirty = false);
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold('''
+          form.write_text(text.replace(old_pop, new_pop, 1), encoding='utf-8')
+
+          if changed_opacity == 0:
+              raise SystemExit('No withOpacity calls were migrated.')
+          print(f'Migrated {changed_opacity} opacity calls.')
+          PY
+
+      - name: Format sources
+        run: dart format lib test
+
+      - name: Commit fixes and remove one-time workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/fix-phase1-analyzer.yml
+          git add lib test .github/workflows/fix-phase1-analyzer.yml
+          git commit -m "fix: align phase 1 UI with Flutter 3.32 APIs"
+          git push origin HEAD:coach-flutlab-v4-0727
