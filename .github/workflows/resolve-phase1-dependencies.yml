@@ -1,0 +1,46 @@
+name: Resolve Phase 1 Dependencies
+
+on:
+  push:
+    branches:
+      - coach-flutlab-v4-0727
+
+permissions:
+  contents: write
+
+concurrency:
+  group: resolve-phase-1-dependencies
+  cancel-in-progress: true
+
+jobs:
+  resolve:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout working branch
+        uses: actions/checkout@v4
+        with:
+          ref: coach-flutlab-v4-0727
+
+      - name: Set up Flutter 3.32.6
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.32.6
+          channel: stable
+          cache: true
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Format sources
+        run: dart format lib test
+
+      - name: Commit deterministic dependency graph
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/resolve-phase1-dependencies.yml
+          git add pubspec.lock lib test .github/workflows/resolve-phase1-dependencies.yml
+          git commit -m "chore: lock phase 1 test dependencies"
+          git push origin HEAD:coach-flutlab-v4-0727
