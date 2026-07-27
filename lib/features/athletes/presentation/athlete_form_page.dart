@@ -127,8 +127,9 @@ class _AthleteFormPageState extends State<AthleteFormPage> {
                         prefixIcon: Icon(Icons.person_outline_rounded),
                       ),
                       validator: (String? value) {
-                        final int length =
-                            InputNormalizer.singleLine(value ?? '').length;
+                        final int length = InputNormalizer.singleLine(
+                          value ?? '',
+                        ).length;
                         if (length < 2) {
                           return 'نام معتبر وارد کنید.';
                         }
@@ -186,12 +187,13 @@ class _AthleteFormPageState extends State<AthleteFormPage> {
                       helperText: _primaryGoal.description,
                       options: AthleteGoal.values
                           .map(
-                            (AthleteGoal goal) => AppSelectionOption<AthleteGoal>(
-                              value: goal,
-                              title: goal.label,
-                              subtitle: goal.description,
-                              icon: _goalIcon(goal),
-                            ),
+                            (AthleteGoal goal) =>
+                                AppSelectionOption<AthleteGoal>(
+                                  value: goal,
+                                  title: goal.label,
+                                  subtitle: goal.description,
+                                  icon: _goalIcon(goal),
+                                ),
                           )
                           .toList(growable: false),
                       onChanged: (AthleteGoal value) {
@@ -225,11 +227,11 @@ class _AthleteFormPageState extends State<AthleteFormPage> {
                           .map(
                             (TrainingLevel level) =>
                                 AppSelectionOption<TrainingLevel>(
-                              value: level,
-                              title: level.label,
-                              subtitle: level.description,
-                              icon: Icons.bar_chart_rounded,
-                            ),
+                                  value: level,
+                                  title: level.label,
+                                  subtitle: level.description,
+                                  icon: Icons.bar_chart_rounded,
+                                ),
                           )
                           .toList(growable: false),
                       onChanged: (TrainingLevel value) {
@@ -250,7 +252,9 @@ class _AthleteFormPageState extends State<AthleteFormPage> {
                         helperText: 'از صفر تا ۷۲۰ ماه',
                       ),
                       validator: (String? value) {
-                        final int? months = InputNormalizer.integer(value ?? '');
+                        final int? months = InputNormalizer.integer(
+                          value ?? '',
+                        );
                         if (months == null || months < 0 || months > 720) {
                           return 'عدد معتبر بین صفر تا ۷۲۰ وارد کنید.';
                         }
@@ -262,30 +266,31 @@ class _AthleteFormPageState extends State<AthleteFormPage> {
                 const SizedBox(height: 16),
                 _FormSection(
                   title: 'ترجیحات برنامه',
-                  subtitle: 'محدودیت زمانی و محیطی برای ساخت برنامه واقع‌بینانه',
+                  subtitle:
+                      'محدودیت زمانی و محیطی برای ساخت برنامه واقع‌بینانه',
                   icon: Icons.tune_rounded,
                   children: <Widget>[
                     AppSelectionField<int>(
                       label: 'تعداد روز تمرین در هفته',
                       value: _daysPerWeek,
                       leadingIcon: Icons.calendar_view_week_rounded,
-                      helperText: 'بر اساس برنامه واقعی زندگی شاگرد انتخاب شود.',
-                      options: List<AppSelectionOption<int>>.generate(
-                        7,
-                        (int index) {
-                          final int value = index + 1;
-                          return AppSelectionOption<int>(
-                            value: value,
-                            title: '$value روز در هفته',
-                            subtitle: value <= 2
-                                ? 'حجم کمتر و تمرکز بیشتر در هر جلسه'
-                                : value <= 4
-                                    ? 'تعادل مناسب برای بیشتر اهداف'
-                                    : 'تقسیم حجم تمرین در جلسات بیشتر',
-                            icon: Icons.event_available_rounded,
-                          );
-                        },
-                      ),
+                      helperText:
+                          'بر اساس برنامه واقعی زندگی شاگرد انتخاب شود.',
+                      options: List<AppSelectionOption<int>>.generate(7, (
+                        int index,
+                      ) {
+                        final int value = index + 1;
+                        return AppSelectionOption<int>(
+                          value: value,
+                          title: '$value روز در هفته',
+                          subtitle: value <= 2
+                              ? 'حجم کمتر و تمرکز بیشتر در هر جلسه'
+                              : value <= 4
+                              ? 'تعادل مناسب برای بیشتر اهداف'
+                              : 'تقسیم حجم تمرین در جلسات بیشتر',
+                          icon: Icons.event_available_rounded,
+                        );
+                      }),
                       onChanged: (int value) {
                         setState(() {
                           _daysPerWeek = value;
@@ -298,7 +303,8 @@ class _AthleteFormPageState extends State<AthleteFormPage> {
                       label: 'مدت ترجیحی هر جلسه',
                       value: _sessionMinutes,
                       leadingIcon: Icons.timer_outlined,
-                      helperText: 'زمان گرم‌کردن و سردکردن نیز در نظر گرفته شود.',
+                      helperText:
+                          'زمان گرم‌کردن و سردکردن نیز در نظر گرفته شود.',
                       options: const <AppSelectionOption<int>>[
                         AppSelectionOption<int>(
                           value: 30,
@@ -333,7 +339,8 @@ class _AthleteFormPageState extends State<AthleteFormPage> {
                         AppSelectionOption<int>(
                           value: 120,
                           title: '۱۲۰ دقیقه',
-                          subtitle: 'فقط برای برنامه‌های خاص و ورزشکاران باتجربه',
+                          subtitle:
+                              'فقط برای برنامه‌های خاص و ورزشکاران باتجربه',
                           icon: Icons.timelapse_rounded,
                         ),
                       ],
@@ -354,11 +361,11 @@ class _AthleteFormPageState extends State<AthleteFormPage> {
                           .map(
                             (TrainingEnvironment environment) =>
                                 AppSelectionOption<TrainingEnvironment>(
-                              value: environment,
-                              title: environment.label,
-                              subtitle: environment.description,
-                              icon: _environmentIcon(environment),
-                            ),
+                                  value: environment,
+                                  title: environment.label,
+                                  subtitle: environment.description,
+                                  icon: _environmentIcon(environment),
+                                ),
                           )
                           .toList(growable: false),
                       onChanged: (TrainingEnvironment value) {
@@ -435,9 +442,7 @@ class _AthleteFormPageState extends State<AthleteFormPage> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.save_outlined),
-                  label: Text(
-                    _isEditing ? 'ذخیره پرونده' : 'ثبت پرونده شاگرد',
-                  ),
+                  label: Text(_isEditing ? 'ذخیره پرونده' : 'ثبت پرونده شاگرد'),
                 ),
               ],
             ),
@@ -527,9 +532,9 @@ class _AthleteFormPageState extends State<AthleteFormPage> {
       }
     } catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_errorMessage(error))),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(_errorMessage(error))));
       }
     } finally {
       if (mounted) {
@@ -623,16 +628,15 @@ class _FormSection extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         title,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w800),
                       ),
                       const SizedBox(height: 3),
                       Text(
                         subtitle,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: colors.onSurfaceVariant,
-                            ),
+                          color: colors.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
@@ -666,8 +670,8 @@ class _DateSelectionField extends StatelessWidget {
     final String label = date == null
         ? 'ثبت نشده'
         : '${date.year.toString().padLeft(4, '0')}/'
-            '${date.month.toString().padLeft(2, '0')}/'
-            '${date.day.toString().padLeft(2, '0')}';
+              '${date.month.toString().padLeft(2, '0')}/'
+              '${date.day.toString().padLeft(2, '0')}';
 
     return InkWell(
       borderRadius: BorderRadius.circular(18),
@@ -701,16 +705,16 @@ class _DateSelectionField extends StatelessWidget {
                   Text(
                     'تاریخ تولد',
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: colors.onSurfaceVariant,
-                        ),
+                      color: colors.onSurfaceVariant,
+                    ),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     label,
                     textDirection: TextDirection.ltr,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ),

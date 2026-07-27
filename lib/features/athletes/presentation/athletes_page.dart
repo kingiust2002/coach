@@ -127,8 +127,7 @@ class _AthletesPageState extends State<AthletesPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (widget.controller.error != null &&
-        widget.controller.athletes.isEmpty) {
+    if (widget.controller.error != null && widget.controller.athletes.isEmpty) {
       return _EmptyState(
         icon: Icons.error_outline_rounded,
         title: 'خواندن اطلاعات انجام نشد',
@@ -176,9 +175,8 @@ class _AthletesPageState extends State<AthletesPage> {
   Future<void> _openForm(BuildContext context) async {
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
-        builder: (BuildContext context) => AthleteFormPage(
-          controller: widget.controller,
-        ),
+        builder: (BuildContext context) =>
+            AthleteFormPage(controller: widget.controller),
       ),
     );
   }
@@ -345,11 +343,11 @@ class _AthleteCard extends StatelessWidget {
                 child: Text(
                   initial,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        color: athlete.isActive
-                            ? colors.onPrimaryContainer
-                            : colors.onSurfaceVariant,
-                      ),
+                    fontWeight: FontWeight.w900,
+                    color: athlete.isActive
+                        ? colors.onPrimaryContainer
+                        : colors.onSurfaceVariant,
+                  ),
                 ),
               ),
               const SizedBox(width: 13),
@@ -364,9 +362,7 @@ class _AthleteCard extends StatelessWidget {
                             athlete.fullName,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
+                            style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(fontWeight: FontWeight.w800),
                           ),
                         ),
@@ -490,9 +486,9 @@ class _EmptyState extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 8),
             Text(

@@ -61,10 +61,7 @@ class AthleteDetailPage extends StatelessWidget {
                       label: 'تاریخ تولد',
                       value: _birthDateLabel(athlete.birthDate),
                     ),
-                    _DetailRowData(
-                      label: 'سن',
-                      value: _ageLabel(athlete),
-                    ),
+                    _DetailRowData(label: 'سن', value: _ageLabel(athlete)),
                     _DetailRowData(
                       label: 'تاریخ ایجاد پرونده',
                       value: _dateLabel(athlete.createdAt),
@@ -139,7 +136,9 @@ class AthleteDetailPage extends StatelessWidget {
                   rows: <_DetailRowData>[
                     _DetailRowData(
                       label: 'یادداشت خصوصی',
-                      value: athlete.notes.isEmpty ? 'یادداشتی ثبت نشده' : athlete.notes,
+                      value: athlete.notes.isEmpty
+                          ? 'یادداشتی ثبت نشده'
+                          : athlete.notes,
                     ),
                   ],
                 ),
@@ -173,10 +172,8 @@ class AthleteDetailPage extends StatelessWidget {
   Future<void> _openEdit(BuildContext context, Athlete athlete) async {
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
-        builder: (BuildContext context) => AthleteFormPage(
-          controller: controller,
-          athlete: athlete,
-        ),
+        builder: (BuildContext context) =>
+            AthleteFormPage(controller: controller, athlete: athlete),
       ),
     );
   }
@@ -228,9 +225,9 @@ class AthleteDetailPage extends StatelessWidget {
   }
 
   void _showFailure(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   static String _birthDateLabel(DateTime? value) {
@@ -285,9 +282,9 @@ class _ProfileHeader extends StatelessWidget {
                 child: Text(
                   initial,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        color: colors.primary,
-                      ),
+                    fontWeight: FontWeight.w900,
+                    color: colors.primary,
+                  ),
                 ),
               ),
               const SizedBox(width: 14),
@@ -297,9 +294,8 @@ class _ProfileHeader extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       athlete.fullName,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w900,
-                          ),
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.w900),
                     ),
                     const SizedBox(height: 5),
                     Text(
@@ -400,8 +396,8 @@ class _DetailSection extends StatelessWidget {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ],
             ),
@@ -443,17 +439,17 @@ class _DetailRow extends StatelessWidget {
       children: <Widget>[
         Text(
           data.label,
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: colors.onSurfaceVariant,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.labelLarge?.copyWith(color: colors.onSurfaceVariant),
         ),
         const SizedBox(height: 5),
         Text(
           data.value,
           textDirection: data.textDirection,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -474,9 +470,9 @@ class _ConnectedFeaturesCard extends StatelessWidget {
           children: <Widget>[
             Text(
               'ادامه پرونده',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 6),
             Text(

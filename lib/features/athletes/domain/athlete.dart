@@ -219,7 +219,8 @@ class Athlete {
       return null;
     }
     int age = referenceDate.year - birth.year;
-    final bool beforeBirthday = referenceDate.month < birth.month ||
+    final bool beforeBirthday =
+        referenceDate.month < birth.month ||
         (referenceDate.month == birth.month && referenceDate.day < birth.day);
     if (beforeBirthday) {
       age--;
@@ -256,8 +257,7 @@ class Athlete {
       goal: goal ?? this.goal,
       trainingLevel: trainingLevel ?? this.trainingLevel,
       experienceMonths: experienceMonths ?? this.experienceMonths,
-      preferredDaysPerWeek:
-          preferredDaysPerWeek ?? this.preferredDaysPerWeek,
+      preferredDaysPerWeek: preferredDaysPerWeek ?? this.preferredDaysPerWeek,
       preferredSessionMinutes:
           preferredSessionMinutes ?? this.preferredSessionMinutes,
       trainingEnvironment: trainingEnvironment ?? this.trainingEnvironment,
@@ -329,10 +329,8 @@ class Athlete {
         (map['training_level'] as String?) ?? '',
       ),
       experienceMonths: (map['experience_months'] as int?) ?? 0,
-      preferredDaysPerWeek:
-          (map['preferred_days_per_week'] as int?) ?? 3,
-      preferredSessionMinutes:
-          (map['preferred_session_minutes'] as int?) ?? 60,
+      preferredDaysPerWeek: (map['preferred_days_per_week'] as int?) ?? 3,
+      preferredSessionMinutes: (map['preferred_session_minutes'] as int?) ?? 60,
       trainingEnvironment: TrainingEnvironment.fromStorage(
         (map['training_environment'] as String?) ?? '',
       ),

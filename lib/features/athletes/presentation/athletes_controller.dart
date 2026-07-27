@@ -77,10 +77,7 @@ class AthletesController extends ChangeNotifier {
     await _mutate(() => _repository.save(athlete));
   }
 
-  Future<void> updateProfile(
-    Athlete athlete,
-    AthleteProfileInput input,
-  ) async {
+  Future<void> updateProfile(Athlete athlete, AthleteProfileInput input) async {
     final AthleteProfileInput normalized = _normalizeAndValidate(input);
     final Athlete updated = athlete.applyProfile(
       normalized,
@@ -162,8 +159,7 @@ class AthletesController extends ChangeNotifier {
     if (date != null && date.isAfter(DateTime.now().toUtc())) {
       throw const FormatException('تاریخ تولد نمی‌تواند در آینده باشد.');
     }
-    if (normalized.experienceMonths < 0 ||
-        normalized.experienceMonths > 720) {
+    if (normalized.experienceMonths < 0 || normalized.experienceMonths > 720) {
       throw const FormatException('سابقه تمرین باید بین صفر تا ۷۲۰ ماه باشد.');
     }
     if (normalized.preferredDaysPerWeek < 1 ||

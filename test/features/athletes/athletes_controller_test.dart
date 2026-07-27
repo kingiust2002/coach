@@ -103,26 +103,29 @@ void main() {
     expect(controller.byId(id)?.id, id);
   });
 
-  test('invalid scheduling preference is rejected before persistence', () async {
-    final _MemoryAthleteRepository repository = _MemoryAthleteRepository();
-    final AthletesController controller = AthletesController(repository);
-    const AthleteProfileInput invalid = AthleteProfileInput(
-      fullName: 'شاگرد',
-      phone: '',
-      birthDate: null,
-      primaryGoal: AthleteGoal.generalFitness,
-      goal: '',
-      trainingLevel: TrainingLevel.beginner,
-      experienceMonths: 0,
-      preferredDaysPerWeek: 8,
-      preferredSessionMinutes: 60,
-      trainingEnvironment: TrainingEnvironment.home,
-      injuries: '',
-      medicalNotes: '',
-      notes: '',
-    );
+  test(
+    'invalid scheduling preference is rejected before persistence',
+    () async {
+      final _MemoryAthleteRepository repository = _MemoryAthleteRepository();
+      final AthletesController controller = AthletesController(repository);
+      const AthleteProfileInput invalid = AthleteProfileInput(
+        fullName: 'شاگرد',
+        phone: '',
+        birthDate: null,
+        primaryGoal: AthleteGoal.generalFitness,
+        goal: '',
+        trainingLevel: TrainingLevel.beginner,
+        experienceMonths: 0,
+        preferredDaysPerWeek: 8,
+        preferredSessionMinutes: 60,
+        trainingEnvironment: TrainingEnvironment.home,
+        injuries: '',
+        medicalNotes: '',
+        notes: '',
+      );
 
-    expect(() => controller.create(invalid), throwsA(isA<FormatException>()));
-    expect(repository.items, isEmpty);
-  });
+      expect(() => controller.create(invalid), throwsA(isA<FormatException>()));
+      expect(repository.items, isEmpty);
+    },
+  );
 }
