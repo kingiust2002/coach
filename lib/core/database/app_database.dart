@@ -38,11 +38,7 @@ class AppDatabase {
     return database;
   }
 
-  Future<void> _upgrade(
-    Database db,
-    int oldVersion,
-    int newVersion,
-  ) async {
+  Future<void> _upgrade(Database db, int oldVersion, int newVersion) async {
     for (
       int targetVersion = oldVersion + 1;
       targetVersion <= newVersion;

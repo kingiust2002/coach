@@ -9,10 +9,7 @@ import '../features/dashboard/presentation/app_shell.dart';
 import 'theme/app_theme.dart';
 
 class CoachApp extends StatefulWidget {
-  const CoachApp({
-    required this.athleteRepository,
-    super.key,
-  });
+  const CoachApp({required this.athleteRepository, super.key});
 
   final AthleteRepository athleteRepository;
 
@@ -42,10 +39,7 @@ class _CoachAppState extends State<CoachApp> {
       debugShowCheckedModeBanner: false,
       title: 'مربی‌یار',
       locale: const Locale('fa'),
-      supportedLocales: const <Locale>[
-        Locale('fa'),
-        Locale('en'),
-      ],
+      supportedLocales: const <Locale>[Locale('fa'), Locale('en')],
       localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

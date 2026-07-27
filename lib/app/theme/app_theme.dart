@@ -9,9 +9,9 @@ abstract final class AppTheme {
       brightness: Brightness.light,
     );
 
-    return _base(scheme).copyWith(
-      scaffoldBackgroundColor: const Color(0xFFF6F8F7),
-    );
+    return _base(
+      scheme,
+    ).copyWith(scaffoldBackgroundColor: const Color(0xFFF6F8F7));
   }
 
   static ThemeData dark() {
@@ -24,24 +24,13 @@ abstract final class AppTheme {
   }
 
   static ThemeData _base(ColorScheme scheme) {
+    // Keep this foundation compatible with both FlutLab Flutter 3.32
+    // and newer stable Flutter releases. Component-level styling can be
+    // expanded after the supported Flutter baseline is pinned.
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
       visualDensity: VisualDensity.standard,
-      inputDecorationTheme: InputDecorationThemeData(
-        filled: true,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
-        ),
-      ),
-      cardTheme: CardThemeData(
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: scheme.outlineVariant),
-        ),
-      ),
       navigationBarTheme: NavigationBarThemeData(
         indicatorColor: scheme.primaryContainer,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,

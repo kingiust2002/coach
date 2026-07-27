@@ -5,10 +5,7 @@ import 'athlete_form_page.dart';
 import 'athletes_controller.dart';
 
 class AthletesPage extends StatefulWidget {
-  const AthletesPage({
-    required this.controller,
-    super.key,
-  });
+  const AthletesPage({required this.controller, super.key});
 
   final AthletesController controller;
 
@@ -24,13 +21,15 @@ class _AthletesPageState extends State<AthletesPage> {
     return AnimatedBuilder(
       animation: widget.controller,
       builder: (BuildContext context, Widget? child) {
-        final List<Athlete> visible = widget.controller.athletes.where((Athlete item) {
-          final String query = _query.trim().toLowerCase();
-          return query.isEmpty ||
-              item.fullName.toLowerCase().contains(query) ||
-              item.phone.contains(query) ||
-              item.goal.toLowerCase().contains(query);
-        }).toList(growable: false);
+        final List<Athlete> visible = widget.controller.athletes
+            .where((Athlete item) {
+              final String query = _query.trim().toLowerCase();
+              return query.isEmpty ||
+                  item.fullName.toLowerCase().contains(query) ||
+                  item.phone.contains(query) ||
+                  item.goal.toLowerCase().contains(query);
+            })
+            .toList(growable: false);
 
         return Scaffold(
           appBar: AppBar(
@@ -38,7 +37,9 @@ class _AthletesPageState extends State<AthletesPage> {
             actions: <Widget>[
               IconButton(
                 tooltip: 'تازه‌سازی',
-                onPressed: widget.controller.isLoading ? null : widget.controller.load,
+                onPressed: widget.controller.isLoading
+                    ? null
+                    : widget.controller.load,
                 icon: const Icon(Icons.refresh),
               ),
             ],
@@ -103,9 +104,16 @@ class _AthletesPageState extends State<AthletesPage> {
           final Athlete athlete = athletes[index];
           return Card(
             child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
               leading: CircleAvatar(
-                child: Text(athlete.fullName.trim().isEmpty ? '؟' : athlete.fullName.trim()[0]),
+                child: Text(
+                  athlete.fullName.trim().isEmpty
+                      ? '؟'
+                      : athlete.fullName.trim()[0],
+                ),
               ),
               title: Text(
                 athlete.fullName,
@@ -132,10 +140,8 @@ class _AthletesPageState extends State<AthletesPage> {
   Future<void> _openForm(BuildContext context, {Athlete? athlete}) async {
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
-        builder: (BuildContext context) => AthleteFormPage(
-          controller: widget.controller,
-          athlete: athlete,
-        ),
+        builder: (BuildContext context) =>
+            AthleteFormPage(controller: widget.controller, athlete: athlete),
       ),
     );
   }
@@ -145,7 +151,9 @@ class _AthletesPageState extends State<AthletesPage> {
       context: context,
       builder: (BuildContext context) => AlertDialog(
         title: const Text('بایگانی شاگرد'),
-        content: Text('«${athlete.fullName}» از فهرست فعال خارج شود؟ اطلاعات حذف نمی‌شود.'),
+        content: Text(
+          '«${athlete.fullName}» از فهرست فعال خارج شود؟ اطلاعات حذف نمی‌شود.',
+        ),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
