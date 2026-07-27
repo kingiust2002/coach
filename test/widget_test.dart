@@ -16,6 +16,9 @@ class _FakeAthleteRepository implements AthleteRepository {
   Future<Athlete?> getById(String id) async => null;
 
   @override
+  Future<void> restore(String id, DateTime updatedAt) async {}
+
+  @override
   Future<void> save(Athlete athlete) async {}
 }
 
