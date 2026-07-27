@@ -28,10 +28,10 @@ class AppDatabase {
         await db.execute('PRAGMA busy_timeout = 5000');
       },
       onCreate: (Database db, int version) async {
-        await db.transaction((Transaction txn) async {
-          await _createAthletes(txn);
-          await _createExercises(txn);
-        });
+        // sqflite already wraps onCreate in a transaction. Starting another
+        // transaction here can deadlock before the first Flutter frame.
+        await _createAthletes(db);
+        await _createExercises(db);
       },
       onUpgrade: _upgrade,
       onDowngrade: (Database db, int oldVersion, int newVersion) async {
@@ -46,6 +46,8 @@ class AppDatabase {
   }
 
   Future<void> _upgrade(Database db, int oldVersion, int newVersion) async {
+    // sqflite already wraps onUpgrade in a transaction, so every migration
+    // below remains atomic without opening nested transactions.
     for (
       int targetVersion = oldVersion + 1;
       targetVersion <= newVersion;
@@ -55,20 +57,21 @@ class AppDatabase {
     }
   }
 
-  Future<void> _migrateTo(Database db, int targetVersion) async {
+  Future<void> _migrateTo(
+    DatabaseExecutor executor,
+    int targetVersion,
+  ) async {
     switch (targetVersion) {
       case 1:
-        await db.transaction(_createAthletes);
+        await _createAthletes(executor);
         return;
       case 2:
-        await db.transaction((Transaction txn) async {
-          for (final String statement in DatabaseSchema.migrateAthletesToV2) {
-            await txn.execute(statement);
-          }
-        });
+        for (final String statement in DatabaseSchema.migrateAthletesToV2) {
+          await executor.execute(statement);
+        }
         return;
       case 3:
-        await db.transaction(_createExercises);
+        await _createExercises(executor);
         return;
       default:
         throw StateError(
@@ -77,20 +80,20 @@ class AppDatabase {
     }
   }
 
-  static Future<void> _createAthletes(Transaction txn) async {
-    await txn.execute(DatabaseSchema.createAthletes);
-    await txn.execute(DatabaseSchema.athletesActiveIndex);
-    await txn.execute(DatabaseSchema.athletesStatusUpdatedIndex);
-    await txn.execute(DatabaseSchema.athletesPhoneIndex);
+  static Future<void> _createAthletes(DatabaseExecutor executor) async {
+    await executor.execute(DatabaseSchema.createAthletes);
+    await executor.execute(DatabaseSchema.athletesActiveIndex);
+    await executor.execute(DatabaseSchema.athletesStatusUpdatedIndex);
+    await executor.execute(DatabaseSchema.athletesPhoneIndex);
   }
 
-  static Future<void> _createExercises(Transaction txn) async {
+  static Future<void> _createExercises(DatabaseExecutor executor) async {
     for (final String statement in DatabaseSchema.migrateToV3) {
-      await txn.execute(statement);
+      await executor.execute(statement);
     }
     for (final Map<String, Object?> seed
         in DatabaseSchema.systemExerciseSeeds) {
-      await txn.insert(
+      await executor.insert(
         DatabaseSchema.exercises,
         seed,
         conflictAlgorithm: ConflictAlgorithm.ignore,
