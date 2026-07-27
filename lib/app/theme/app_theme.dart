@@ -35,7 +35,7 @@ abstract final class AppTheme {
       visualDensity: VisualDensity.standard,
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: scheme.surfaceContainerHighest.withOpacity(0.42),
+        fillColor: scheme.surfaceContainerHighest.withValues(alpha: 0.42),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 15,
@@ -52,14 +52,16 @@ abstract final class AppTheme {
           borderSide: BorderSide(color: scheme.error, width: 1.5),
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0,
         margin: EdgeInsets.zero,
         clipBehavior: Clip.antiAlias,
         color: scheme.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(22),
-          side: BorderSide(color: scheme.outlineVariant.withOpacity(0.8)),
+          side: BorderSide(
+            color: scheme.outlineVariant.withValues(alpha: 0.8),
+          ),
         ),
       ),
       appBarTheme: AppBarTheme(
