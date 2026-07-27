@@ -6,12 +6,19 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import '../features/athletes/data/athlete_repository.dart';
 import '../features/athletes/presentation/athletes_controller.dart';
 import '../features/dashboard/presentation/app_shell.dart';
+import '../features/exercises/data/exercise_repository.dart';
+import '../features/exercises/presentation/exercises_controller.dart';
 import 'theme/app_theme.dart';
 
 class CoachApp extends StatefulWidget {
-  const CoachApp({required this.athleteRepository, super.key});
+  const CoachApp({
+    required this.athleteRepository,
+    required this.exerciseRepository,
+    super.key,
+  });
 
   final AthleteRepository athleteRepository;
+  final ExerciseRepository exerciseRepository;
 
   @override
   State<CoachApp> createState() => _CoachAppState();
@@ -19,17 +26,21 @@ class CoachApp extends StatefulWidget {
 
 class _CoachAppState extends State<CoachApp> {
   late final AthletesController _athletesController;
+  late final ExercisesController _exercisesController;
 
   @override
   void initState() {
     super.initState();
     _athletesController = AthletesController(widget.athleteRepository);
+    _exercisesController = ExercisesController(widget.exerciseRepository);
     unawaited(_athletesController.load());
+    unawaited(_exercisesController.load());
   }
 
   @override
   void dispose() {
     _athletesController.dispose();
+    _exercisesController.dispose();
     super.dispose();
   }
 
@@ -50,7 +61,10 @@ class _CoachAppState extends State<CoachApp> {
       themeMode: ThemeMode.system,
       home: Directionality(
         textDirection: TextDirection.rtl,
-        child: AppShell(controller: _athletesController),
+        child: AppShell(
+          athletesController: _athletesController,
+          exercisesController: _exercisesController,
+        ),
       ),
     );
   }
