@@ -3,6 +3,8 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
+    id("kotlin-android")
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -12,12 +14,13 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
-val hasReleaseSigning = listOf(
-    "keyAlias",
-    "keyPassword",
-    "storeFile",
-    "storePassword",
-).all { key -> !keystoreProperties.getProperty(key).isNullOrBlank() }
+val hasReleaseSigning =
+    listOf(
+        "keyAlias",
+        "keyPassword",
+        "storeFile",
+        "storePassword",
+    ).all { key -> !keystoreProperties.getProperty(key).isNullOrBlank() }
 
 android {
     namespace = "com.kingiust.coach"
@@ -25,8 +28,12 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
     defaultConfig {
@@ -50,21 +57,15 @@ android {
 
     buildTypes {
         release {
-            // Development builds remain installable before a private keystore is
-            // provisioned. Production builds automatically switch to the stable
-            // release key as soon as android/key.properties is present.
-            signingConfig = if (hasReleaseSigning) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
-            }
+            // Debug signing is only a development fallback. Production release
+            // builds use the private stable key when android/key.properties exists.
+            signingConfig =
+                if (hasReleaseSigning) {
+                    signingConfigs.getByName("release")
+                } else {
+                    signingConfigs.getByName("debug")
+                }
         }
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
 
