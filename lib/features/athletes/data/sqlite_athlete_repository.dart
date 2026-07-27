@@ -17,7 +17,7 @@ class SqliteAthleteRepository implements AthleteRepository {
       DatabaseSchema.athletes,
       where: includeArchived ? null : 'is_active = ?',
       whereArgs: includeArchived ? null : <Object?>[1],
-      orderBy: 'updated_at DESC, full_name COLLATE NOCASE ASC',
+      orderBy: 'is_active DESC, updated_at DESC, full_name COLLATE NOCASE ASC',
     );
 
     return rows.map(Athlete.fromMap).toList(growable: false);
@@ -38,25 +38,53 @@ class SqliteAthleteRepository implements AthleteRepository {
 
   @override
   Future<void> save(Athlete athlete) async {
-    final Database db = await _database.open();
-    await db.insert(
-      DatabaseSchema.athletes,
-      athlete.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _database.transaction((Transaction txn) async {
+      final int updated = await txn.update(
+        DatabaseSchema.athletes,
+        athlete.toMap(),
+        where: 'id = ?',
+        whereArgs: <Object?>[athlete.id],
+        conflictAlgorithm: ConflictAlgorithm.abort,
+      );
+      if (updated == 0) {
+        await txn.insert(
+          DatabaseSchema.athletes,
+          athlete.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.abort,
+        );
+      }
+    });
   }
 
   @override
   Future<void> archive(String id, DateTime updatedAt) async {
+    await _setActive(id, isActive: false, updatedAt: updatedAt);
+  }
+
+  @override
+  Future<void> restore(String id, DateTime updatedAt) async {
+    await _setActive(id, isActive: true, updatedAt: updatedAt);
+  }
+
+  Future<void> _setActive(
+    String id, {
+    required bool isActive,
+    required DateTime updatedAt,
+  }) async {
     final Database db = await _database.open();
-    await db.update(
+    final String timestamp = updatedAt.toUtc().toIso8601String();
+    final int changed = await db.update(
       DatabaseSchema.athletes,
       <String, Object?>{
-        'is_active': 0,
-        'updated_at': updatedAt.toUtc().toIso8601String(),
+        'is_active': isActive ? 1 : 0,
+        'archived_at': isActive ? null : timestamp,
+        'updated_at': timestamp,
       },
       where: 'id = ?',
       whereArgs: <Object?>[id],
     );
+    if (changed != 1) {
+      throw StateError('Athlete $id was not found.');
+    }
   }
 }
