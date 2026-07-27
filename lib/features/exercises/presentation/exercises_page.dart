@@ -671,7 +671,7 @@ class _NullableDropdown<T> extends StatelessWidget {
       value: value,
       decoration: InputDecoration(labelText: label),
       items: <DropdownMenuItem<T?>>[
-        const DropdownMenuItem<T?>(value: null, child: Text('همه')),
+        DropdownMenuItem<T?>(value: null, child: const Text('همه')),
         ...values.map(
           (T item) =>
               DropdownMenuItem<T?>(value: item, child: Text(text(item))),
