@@ -22,6 +22,13 @@ val hasReleaseSigning =
         "storePassword",
     ).all { key -> !keystoreProperties.getProperty(key).isNullOrBlank() }
 
+// This checked-in key is intentionally development-only. It gives every
+// FlutLab/GitHub debug build the same certificate, so APKs from newly imported
+// workspaces can update one another without deleting app data.
+val developmentKeystoreFile = rootProject.file("coach-flutlab-dev.jks")
+val developmentKeyAlias = "coach-flutlab-dev"
+val developmentKeyPassword = "coach-flutlab-development-2026"
+
 android {
     namespace = "com.kingiust.coach"
     compileSdk = flutter.compileSdkVersion
@@ -45,6 +52,13 @@ android {
     }
 
     signingConfigs {
+        create("development") {
+            keyAlias = developmentKeyAlias
+            keyPassword = developmentKeyPassword
+            storeFile = developmentKeystoreFile
+            storePassword = developmentKeyPassword
+        }
+
         if (hasReleaseSigning) {
             create("release") {
                 keyAlias = keystoreProperties.getProperty("keyAlias")
@@ -56,14 +70,18 @@ android {
     }
 
     buildTypes {
-        release {
-            // Debug signing is only a development fallback. Production release
-            // builds use the private stable key when android/key.properties exists.
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("development")
+        }
+
+        getByName("release") {
+            // Production builds can override the public development key by
+            // supplying android/key.properties and a private keystore.
             signingConfig =
                 if (hasReleaseSigning) {
                     signingConfigs.getByName("release")
                 } else {
-                    signingConfigs.getByName("debug")
+                    signingConfigs.getByName("development")
                 }
         }
     }
