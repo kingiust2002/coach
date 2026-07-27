@@ -19,7 +19,7 @@ env:
   FLUTTER_VERSION: 3.32.6
 
 jobs:
-  diagnose-phase2:
+  fix-phase2:
     if: github.event_name == 'pull_request' && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -36,19 +36,77 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Capture analyzer output
+      - name: Apply verified API fixes
         shell: bash
         run: |
-          flutter pub get
-          flutter analyze --no-fatal-infos > docs/PHASE2_ANALYZE.log 2>&1 || true
+          python3 - <<'PY'
+          from pathlib import Path
 
-      - name: Commit analyzer report
+          for path in Path('lib').rglob('*.dart'):
+              text = path.read_text(encoding='utf-8')
+              text = text.replace('.withOpacity(', '.withValues(alpha: ')
+              path.write_text(text, encoding='utf-8')
+
+          exercises_page = Path('lib/features/exercises/presentation/exercises_page.dart')
+          text = exercises_page.read_text(encoding='utf-8')
+          old = "const DropdownMenuItem<T?>(value: null, child: Text('همه'))"
+          if old not in text:
+              raise SystemExit('Generic DropdownMenuItem pattern not found.')
+          exercises_page.write_text(text.replace(old, "DropdownMenuItem<T?>(value: null, child: const Text('همه'))", 1), encoding='utf-8')
+
+          exercise_form = Path('lib/features/exercises/presentation/exercise_form_page.dart')
+          text = exercise_form.read_text(encoding='utf-8')
+          old = '''        final bool discard = await _confirmDiscard();
+        if (discard && mounted) {
+          setState(() => _dirty = false);
+          Navigator.of(context).pop();
+        }'''
+          new = '''        final bool discard = await _confirmDiscard();
+        if (!discard || !context.mounted) {
+          return;
+        }
+        setState(() => _dirty = false);
+        Navigator.of(context).pop();'''
+          if old not in text:
+              raise SystemExit('Exercise PopScope pattern not found.')
+          exercise_form.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          athlete_form = Path('lib/features/athletes/presentation/athlete_form_page.dart')
+          text = athlete_form.read_text(encoding='utf-8')
+          old = '''    return WillPopScope(
+      onWillPop: _confirmDiscard,
+      child: Scaffold('''
+          new = '''    return PopScope<Object?>(
+      canPop: !_dirty,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop || _saving || !_dirty) {
+          return;
+        }
+        final bool discard = await _confirmDiscard();
+        if (!discard || !context.mounted) {
+          return;
+        }
+        setState(() => _dirty = false);
+        Navigator.of(context).pop();
+      },
+      child: Scaffold('''
+          if old not in text:
+              raise SystemExit('Athlete WillPopScope pattern not found.')
+          athlete_form.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+
+          rm -f docs/PHASE2_ANALYZE.log
+          dart format lib test
+          flutter pub get
+          flutter analyze --no-fatal-infos
+
+      - name: Commit clean analyzer baseline
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/PHASE2_ANALYZE.log
-          git commit -m "chore: capture phase 2 analyzer report"
+          git add lib test docs/PHASE2_ANALYZE.log
+          git commit -m "refactor: clean phase 2 Flutter analyzer output"
           git push origin HEAD:${{ github.event.pull_request.head.ref }}
 
   android-verify:
