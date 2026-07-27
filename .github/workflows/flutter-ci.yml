@@ -108,4 +108,35 @@ jobs:
         run: flutter pub get
 
       - name: Build iOS without code signing
-        run: flutter build ios --debug --no-codesign
+        id: ios_build
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          flutter build ios --debug --no-codesign 2>&1 | tee ios-build.log
+
+      - name: Upload iOS build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-log-flutter-${{ env.FLUTTER_VERSION }}
+          path: ios-build.log
+          if-no-files-found: warn
+
+      - name: Report iOS build failure
+        if: steps.ios_build.outcome == 'failure' && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const output = fs.readFileSync('ios-build.log', 'utf8').slice(-50000);
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `<!-- flutter-ios-build-report -->\n### Flutter iOS build failed\n\n\`\`\`text\n${output}\n\`\`\``
+            });
+
+      - name: Enforce iOS build result
+        if: steps.ios_build.outcome == 'failure'
+        run: exit 1
