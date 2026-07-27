@@ -1,0 +1,49 @@
+name: Normalize FlutLab Baseline
+
+on:
+  push:
+    branches:
+      - coach-flutlab-v3-0726
+
+permissions:
+  contents: write
+
+concurrency:
+  group: normalize-flutlab-baseline
+  cancel-in-progress: true
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: coach-flutlab-v3-0726
+
+      - name: Set up Flutter 3.32.6
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.32.6
+          channel: stable
+          cache: true
+
+      - name: Resolve and format
+        run: |
+          flutter pub get
+          dart format lib test
+
+      - name: Commit normalized files and remove one-time workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/normalize-flutlab.yml
+          git add lib test pubspec.lock .github/workflows/normalize-flutlab.yml
+          if git diff --cached --quiet; then
+            echo "No normalization changes found."
+            exit 0
+          fi
+          git commit -m "chore: normalize project with Flutter 3.32.6"
+          git push origin HEAD:coach-flutlab-v3-0726
