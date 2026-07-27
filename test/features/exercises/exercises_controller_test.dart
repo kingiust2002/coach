@@ -55,19 +55,19 @@ class _MemoryExerciseRepository implements ExerciseRepository {
 }
 
 ExerciseInput _input({String name = 'پرس آرنولدی'}) => ExerciseInput(
-      nameFa: name,
-      nameEn: 'Arnold Press',
-      primaryMuscle: MuscleGroup.shoulders,
-      secondaryMuscles: <MuscleGroup>{MuscleGroup.triceps},
-      type: ExerciseType.compound,
-      equipment: ExerciseEquipment.dumbbell,
-      difficulty: ExerciseDifficulty.intermediate,
-      movementPattern: MovementPattern.verticalPush,
-      laterality: ExerciseLaterality.bilateral,
-      instructions: 'با کنترل اجرا شود.',
-      safetyNotes: 'دامنه بدون درد باشد.',
-      coachNotes: '',
-    );
+  nameFa: name,
+  nameEn: 'Arnold Press',
+  primaryMuscle: MuscleGroup.shoulders,
+  secondaryMuscles: <MuscleGroup>{MuscleGroup.triceps},
+  type: ExerciseType.compound,
+  equipment: ExerciseEquipment.dumbbell,
+  difficulty: ExerciseDifficulty.intermediate,
+  movementPattern: MovementPattern.verticalPush,
+  laterality: ExerciseLaterality.bilateral,
+  instructions: 'با کنترل اجرا شود.',
+  safetyNotes: 'دامنه بدون درد باشد.',
+  coachNotes: '',
+);
 
 void main() {
   test('create archive and restore keep the same exercise id', () async {
@@ -115,10 +115,7 @@ void main() {
         nameFa: 'حرکت آزمایشی',
         nameEn: '',
         primaryMuscle: MuscleGroup.chest,
-        secondaryMuscles: <MuscleGroup>{
-          MuscleGroup.chest,
-          MuscleGroup.triceps,
-        },
+        secondaryMuscles: <MuscleGroup>{MuscleGroup.chest, MuscleGroup.triceps},
         type: ExerciseType.compound,
         equipment: ExerciseEquipment.bodyweight,
         difficulty: ExerciseDifficulty.beginner,
@@ -130,9 +127,8 @@ void main() {
       ),
     );
 
-    expect(
-      controller.exercises.single.secondaryMuscles,
-      <MuscleGroup>{MuscleGroup.triceps},
-    );
+    expect(controller.exercises.single.secondaryMuscles, <MuscleGroup>{
+      MuscleGroup.triceps,
+    });
   });
 }

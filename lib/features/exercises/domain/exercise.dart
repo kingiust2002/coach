@@ -158,7 +158,11 @@ class Exercise {
 
   String get displayName => nameEn.isEmpty ? nameFa : '$nameFa · $nameEn';
 
-  Exercise applyInput(ExerciseInput input, String normalizedNameKey, DateTime now) {
+  Exercise applyInput(
+    ExerciseInput input,
+    String normalizedNameKey,
+    DateTime now,
+  ) {
     if (isSystem) {
       throw StateError('حرکت سیستمی قابل ویرایش نیست.');
     }
@@ -186,32 +190,33 @@ class Exercise {
   }
 
   Map<String, Object?> toMap() => <String, Object?>{
-        'id': id,
-        'name_fa': nameFa,
-        'name_key': nameKey,
-        'name_en': nameEn,
-        'primary_muscle': primaryMuscle.name,
-        'secondary_muscles': jsonEncode(
-          secondaryMuscles.map((MuscleGroup item) => item.name).toList(),
-        ),
-        'exercise_type': type.name,
-        'equipment': equipment.name,
-        'difficulty': difficulty.name,
-        'movement_pattern': movementPattern.name,
-        'laterality': laterality.name,
-        'instructions': instructions,
-        'safety_notes': safetyNotes,
-        'coach_notes': coachNotes,
-        'is_active': isActive ? 1 : 0,
-        'is_system': isSystem ? 1 : 0,
-        'archived_at': archivedAt?.toUtc().toIso8601String(),
-        'created_at': createdAt.toUtc().toIso8601String(),
-        'updated_at': updatedAt.toUtc().toIso8601String(),
-      };
+    'id': id,
+    'name_fa': nameFa,
+    'name_key': nameKey,
+    'name_en': nameEn,
+    'primary_muscle': primaryMuscle.name,
+    'secondary_muscles': jsonEncode(
+      secondaryMuscles.map((MuscleGroup item) => item.name).toList(),
+    ),
+    'exercise_type': type.name,
+    'equipment': equipment.name,
+    'difficulty': difficulty.name,
+    'movement_pattern': movementPattern.name,
+    'laterality': laterality.name,
+    'instructions': instructions,
+    'safety_notes': safetyNotes,
+    'coach_notes': coachNotes,
+    'is_active': isActive ? 1 : 0,
+    'is_system': isSystem ? 1 : 0,
+    'archived_at': archivedAt?.toUtc().toIso8601String(),
+    'created_at': createdAt.toUtc().toIso8601String(),
+    'updated_at': updatedAt.toUtc().toIso8601String(),
+  };
 
   factory Exercise.fromMap(Map<String, Object?> map) {
     final Object? rawSecondary = map['secondary_muscles'];
-    final List<dynamic> decoded = rawSecondary is String && rawSecondary.isNotEmpty
+    final List<dynamic> decoded =
+        rawSecondary is String && rawSecondary.isNotEmpty
         ? jsonDecode(rawSecondary) as List<dynamic>
         : <dynamic>[];
     return Exercise(

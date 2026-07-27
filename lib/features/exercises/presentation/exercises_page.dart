@@ -133,7 +133,10 @@ class _ExercisesPageState extends State<ExercisesPage> {
                       ),
                       if (_hasAdvancedFilters)
                         ActionChip(
-                          avatar: const Icon(Icons.filter_alt_off_outlined, size: 18),
+                          avatar: const Icon(
+                            Icons.filter_alt_off_outlined,
+                            size: 18,
+                          ),
                           label: const Text('پاک‌کردن'),
                           onPressed: _clearAdvancedFilters,
                         ),
@@ -167,7 +170,8 @@ class _ExercisesPageState extends State<ExercisesPage> {
     if (widget.controller.isLoading && widget.controller.exercises.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (widget.controller.error != null && widget.controller.exercises.isEmpty) {
+    if (widget.controller.error != null &&
+        widget.controller.exercises.isEmpty) {
       return _EmptyState(
         icon: Icons.cloud_off_outlined,
         title: 'بارگذاری کتابخانه انجام نشد',
@@ -218,41 +222,44 @@ class _ExercisesPageState extends State<ExercisesPage> {
 
   List<Exercise> _filteredExercises() {
     final String query = _normalized(_search.text);
-    return widget.controller.exercises.where((Exercise exercise) {
-      final bool statusMatches = switch (_status) {
-        ExerciseStatusFilter.active => exercise.isActive,
-        ExerciseStatusFilter.archived => !exercise.isActive,
-        ExerciseStatusFilter.all => true,
-      };
-      final bool sourceMatches = switch (_source) {
-        ExerciseSourceFilter.all => true,
-        ExerciseSourceFilter.system => exercise.isSystem,
-        ExerciseSourceFilter.custom => !exercise.isSystem,
-      };
-      final bool queryMatches = query.isEmpty ||
-          _normalized(
-            <String>[
-              exercise.nameFa,
-              exercise.nameEn,
-              exercise.primaryMuscle.label,
-              ...exercise.secondaryMuscles.map(
-                (MuscleGroup item) => item.label,
-              ),
-              exercise.equipment.label,
-              exercise.type.label,
-              exercise.movementPattern.label,
-            ].join(' '),
-          ).contains(query);
-      return statusMatches &&
-          sourceMatches &&
-          queryMatches &&
-          (_muscle == null ||
-              exercise.primaryMuscle == _muscle ||
-              exercise.secondaryMuscles.contains(_muscle)) &&
-          (_equipment == null || exercise.equipment == _equipment) &&
-          (_type == null || exercise.type == _type) &&
-          (_difficulty == null || exercise.difficulty == _difficulty);
-    }).toList(growable: false);
+    return widget.controller.exercises
+        .where((Exercise exercise) {
+          final bool statusMatches = switch (_status) {
+            ExerciseStatusFilter.active => exercise.isActive,
+            ExerciseStatusFilter.archived => !exercise.isActive,
+            ExerciseStatusFilter.all => true,
+          };
+          final bool sourceMatches = switch (_source) {
+            ExerciseSourceFilter.all => true,
+            ExerciseSourceFilter.system => exercise.isSystem,
+            ExerciseSourceFilter.custom => !exercise.isSystem,
+          };
+          final bool queryMatches =
+              query.isEmpty ||
+              _normalized(
+                <String>[
+                  exercise.nameFa,
+                  exercise.nameEn,
+                  exercise.primaryMuscle.label,
+                  ...exercise.secondaryMuscles.map(
+                    (MuscleGroup item) => item.label,
+                  ),
+                  exercise.equipment.label,
+                  exercise.type.label,
+                  exercise.movementPattern.label,
+                ].join(' '),
+              ).contains(query);
+          return statusMatches &&
+              sourceMatches &&
+              queryMatches &&
+              (_muscle == null ||
+                  exercise.primaryMuscle == _muscle ||
+                  exercise.secondaryMuscles.contains(_muscle)) &&
+              (_equipment == null || exercise.equipment == _equipment) &&
+              (_type == null || exercise.type == _type) &&
+              (_difficulty == null || exercise.difficulty == _difficulty);
+        })
+        .toList(growable: false);
   }
 
   String _normalized(String value) => value
@@ -265,28 +272,28 @@ class _ExercisesPageState extends State<ExercisesPage> {
   Future<void> _createExercise() async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (BuildContext context) => ExerciseFormPage(
-          controller: widget.controller,
-        ),
+        builder: (BuildContext context) =>
+            ExerciseFormPage(controller: widget.controller),
       ),
     );
   }
 
   Future<void> _openFilters() async {
-    final _FilterSelection? result = await showModalBottomSheet<_FilterSelection>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (BuildContext context) => _FilterSheet(
-        initial: _FilterSelection(
-          source: _source,
-          muscle: _muscle,
-          equipment: _equipment,
-          type: _type,
-          difficulty: _difficulty,
-        ),
-      ),
-    );
+    final _FilterSelection? result =
+        await showModalBottomSheet<_FilterSelection>(
+          context: context,
+          isScrollControlled: true,
+          useSafeArea: true,
+          builder: (BuildContext context) => _FilterSheet(
+            initial: _FilterSelection(
+              source: _source,
+              muscle: _muscle,
+              equipment: _equipment,
+              type: _type,
+              difficulty: _difficulty,
+            ),
+          ),
+        );
     if (result == null) {
       return;
     }
@@ -333,7 +340,9 @@ class _CatalogSummary extends StatelessWidget {
             const Icon(Icons.library_books_outlined),
             const SizedBox(width: 10),
             Expanded(child: Text('$visibleCount نتیجه')),
-            Text('$activeCount فعال · $systemCount سیستمی · $customCount سفارشی'),
+            Text(
+              '$activeCount فعال · $systemCount سیستمی · $customCount سفارشی',
+            ),
           ],
         ),
       ),
@@ -383,9 +392,7 @@ class _ExerciseCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             exercise.nameFa,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
+                            style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(fontWeight: FontWeight.w700),
                           ),
                         ),
@@ -549,17 +556,18 @@ class _FilterSheetState extends State<_FilterSheet> {
               ),
             ),
             const SizedBox(height: 16),
-            Text('فیلتر کتابخانه', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'فیلتر کتابخانه',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 16),
             DropdownButtonFormField<ExerciseSourceFilter>(
               value: _source,
               decoration: const InputDecoration(labelText: 'منبع حرکت'),
               items: ExerciseSourceFilter.values
                   .map(
-                    (ExerciseSourceFilter item) => DropdownMenuItem(
-                      value: item,
-                      child: Text(item.label),
-                    ),
+                    (ExerciseSourceFilter item) =>
+                        DropdownMenuItem(value: item, child: Text(item.label)),
                   )
                   .toList(growable: false),
               onChanged: (ExerciseSourceFilter? value) {
@@ -574,7 +582,8 @@ class _FilterSheetState extends State<_FilterSheet> {
               value: _muscle,
               values: MuscleGroup.values,
               text: (MuscleGroup item) => item.label,
-              onChanged: (MuscleGroup? value) => setState(() => _muscle = value),
+              onChanged: (MuscleGroup? value) =>
+                  setState(() => _muscle = value),
             ),
             const SizedBox(height: 12),
             _NullableDropdown<ExerciseEquipment>(
@@ -664,10 +673,8 @@ class _NullableDropdown<T> extends StatelessWidget {
       items: <DropdownMenuItem<T?>>[
         const DropdownMenuItem<T?>(value: null, child: Text('همه')),
         ...values.map(
-          (T item) => DropdownMenuItem<T?>(
-            value: item,
-            child: Text(text(item)),
-          ),
+          (T item) =>
+              DropdownMenuItem<T?>(value: item, child: Text(text(item))),
         ),
       ],
       onChanged: onChanged,

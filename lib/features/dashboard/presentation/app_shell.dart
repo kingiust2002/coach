@@ -188,9 +188,9 @@ class _StatCard extends StatelessWidget {
               const SizedBox(height: 14),
               Text(
                 value,
-                style: Theme.of(
-                  context,
-                ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               Text(title),
             ],

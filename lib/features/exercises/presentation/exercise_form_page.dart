@@ -5,11 +5,7 @@ import '../domain/exercise.dart';
 import 'exercises_controller.dart';
 
 class ExerciseFormPage extends StatefulWidget {
-  const ExerciseFormPage({
-    required this.controller,
-    this.exercise,
-    super.key,
-  });
+  const ExerciseFormPage({required this.controller, this.exercise, super.key});
 
   final ExercisesController controller;
   final Exercise? exercise;
@@ -318,9 +314,7 @@ class _ExerciseFormPageState extends State<ExerciseFormPage> {
     String Function(T item) label,
   ) {
     return values
-        .map(
-          (T item) => AppSelectionOption<T>(value: item, title: label(item)),
-        )
+        .map((T item) => AppSelectionOption<T>(value: item, title: label(item)))
         .toList(growable: false);
   }
 
@@ -358,9 +352,9 @@ class _ExerciseFormPageState extends State<ExerciseFormPage> {
       Navigator.of(context).pop(true);
     } catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_messageFor(error))),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(_messageFor(error))));
       }
     } finally {
       if (mounted) {
@@ -430,9 +424,15 @@ class _FormSection extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(title, style: Theme.of(context).textTheme.titleMedium),
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                       const SizedBox(height: 2),
-                      Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+                      Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     ],
                   ),
                 ),

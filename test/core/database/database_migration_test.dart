@@ -159,10 +159,7 @@ CREATE TABLE ${DatabaseSchema.athletes} (
       DatabaseSchema.exercises,
       orderBy: 'name_fa ASC',
     );
-    expect(
-      exerciseRows.length,
-      DatabaseSchema.systemExerciseSeeds.length,
-    );
+    expect(exerciseRows.length, DatabaseSchema.systemExerciseSeeds.length);
     final Exercise exercise = Exercise.fromMap(exerciseRows.first);
     expect(exercise.isSystem, isTrue);
     expect(exercise.isActive, isTrue);

@@ -118,8 +118,8 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
 
   static const String _seedTime = '2026-01-01T00:00:00.000Z';
 
-  static const List<Map<String, Object?>> systemExerciseSeeds =
-      <Map<String, Object?>>[
+  static const List<Map<String, Object?>>
+  systemExerciseSeeds = <Map<String, Object?>>[
     <String, Object?>{
       'id': 'sys_back_squat',
       'name_fa': 'اسکوات هالتر پشت',
@@ -132,8 +132,10 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'intermediate',
       'movement_pattern': 'squat',
       'laterality': 'bilateral',
-      'instructions': 'هالتر را پایدار روی پشت قرار دهید، تنه را کنترل کنید و با حفظ مسیر زانو و کف پا پایین بروید.',
-      'safety_notes': 'ستون فقرات خنثی بماند و عمق حرکت متناسب با کنترل و دامنه بدون درد انتخاب شود.',
+      'instructions':
+          'هالتر را پایدار روی پشت قرار دهید، تنه را کنترل کنید و با حفظ مسیر زانو و کف پا پایین بروید.',
+      'safety_notes':
+          'ستون فقرات خنثی بماند و عمق حرکت متناسب با کنترل و دامنه بدون درد انتخاب شود.',
       'coach_notes': '',
       'is_active': 1,
       'is_system': 1,
@@ -153,7 +155,8 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'beginner',
       'movement_pattern': 'squat',
       'laterality': 'bilateral',
-      'instructions': 'دمبل را نزدیک سینه نگه دارید و با کنترل لگن و زانو بنشینید و بلند شوید.',
+      'instructions':
+          'دمبل را نزدیک سینه نگه دارید و با کنترل لگن و زانو بنشینید و بلند شوید.',
       'safety_notes': 'پاشنه‌ها روی زمین و زانوها هم‌جهت پنجه‌ها باقی بمانند.',
       'coach_notes': '',
       'is_active': 1,
@@ -174,7 +177,8 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'advanced',
       'movement_pattern': 'hinge',
       'laterality': 'bilateral',
-      'instructions': 'میله را نزدیک ساق نگه دارید، لگن را عقب ببرید و با فشار پاها و بازشدن لگن بلند شوید.',
+      'instructions':
+          'میله را نزدیک ساق نگه دارید، لگن را عقب ببرید و با فشار پاها و بازشدن لگن بلند شوید.',
       'safety_notes': 'پشت خنثی، شکم منقبض و بار متناسب با مهارت انتخاب شود.',
       'coach_notes': '',
       'is_active': 1,
@@ -195,8 +199,10 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'intermediate',
       'movement_pattern': 'hinge',
       'laterality': 'bilateral',
-      'instructions': 'با زانوی کمی خم، لگن را عقب ببرید و میله را نزدیک ران و ساق پایین آورید.',
-      'safety_notes': 'دامنه را تا جایی ادامه دهید که ستون فقرات خنثی و کشش همسترینگ کنترل‌شده باشد.',
+      'instructions':
+          'با زانوی کمی خم، لگن را عقب ببرید و میله را نزدیک ران و ساق پایین آورید.',
+      'safety_notes':
+          'دامنه را تا جایی ادامه دهید که ستون فقرات خنثی و کشش همسترینگ کنترل‌شده باشد.',
       'coach_notes': '',
       'is_active': 1,
       'is_system': 1,
@@ -216,8 +222,10 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'intermediate',
       'movement_pattern': 'horizontalPush',
       'laterality': 'bilateral',
-      'instructions': 'کتف‌ها را پایدار کنید، میله را کنترل‌شده پایین آورید و در مسیر ثابت پرس کنید.',
-      'safety_notes': 'برای وزنه‌های سنگین از مراقب استفاده شود و مچ‌ها روی ساعد قرار بگیرند.',
+      'instructions':
+          'کتف‌ها را پایدار کنید، میله را کنترل‌شده پایین آورید و در مسیر ثابت پرس کنید.',
+      'safety_notes':
+          'برای وزنه‌های سنگین از مراقب استفاده شود و مچ‌ها روی ساعد قرار بگیرند.',
       'coach_notes': '',
       'is_active': 1,
       'is_system': 1,
@@ -237,7 +245,8 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'beginner',
       'movement_pattern': 'horizontalPush',
       'laterality': 'bilateral',
-      'instructions': 'بدن را یکپارچه نگه دارید، سینه را کنترل‌شده پایین ببرید و زمین را دور کنید.',
+      'instructions':
+          'بدن را یکپارچه نگه دارید، سینه را کنترل‌شده پایین ببرید و زمین را دور کنید.',
       'safety_notes': 'افتادگی کمر یا جلوآمدن شدید سر ایجاد نشود.',
       'coach_notes': '',
       'is_active': 1,
@@ -258,7 +267,8 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'intermediate',
       'movement_pattern': 'verticalPush',
       'laterality': 'bilateral',
-      'instructions': 'میله را از جلوی شانه‌ها به بالای سر پرس کنید و تنه را پایدار نگه دارید.',
+      'instructions':
+          'میله را از جلوی شانه‌ها به بالای سر پرس کنید و تنه را پایدار نگه دارید.',
       'safety_notes': 'از قوس بیش‌ازحد کمر و مسیر دردناک شانه اجتناب شود.',
       'coach_notes': '',
       'is_active': 1,
@@ -279,8 +289,10 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'beginner',
       'movement_pattern': 'isolation',
       'laterality': 'bilateral',
-      'instructions': 'دمبل‌ها را با آرنج کمی خم تا محدوده کنترل‌شده کنار بدن بالا ببرید.',
-      'safety_notes': 'با تاب‌دادن تنه یا بالابردن شانه‌ها حرکت را جبران نکنید.',
+      'instructions':
+          'دمبل‌ها را با آرنج کمی خم تا محدوده کنترل‌شده کنار بدن بالا ببرید.',
+      'safety_notes':
+          'با تاب‌دادن تنه یا بالابردن شانه‌ها حرکت را جبران نکنید.',
       'coach_notes': '',
       'is_active': 1,
       'is_system': 1,
@@ -300,7 +312,8 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'intermediate',
       'movement_pattern': 'horizontalPull',
       'laterality': 'bilateral',
-      'instructions': 'در وضعیت هیپ‌هینج پایدار، میله را به سمت تنه بکشید و کتف‌ها را کنترل کنید.',
+      'instructions':
+          'در وضعیت هیپ‌هینج پایدار، میله را به سمت تنه بکشید و کتف‌ها را کنترل کنید.',
       'safety_notes': 'زاویه تنه و ستون فقرات در طول ست ثابت بماند.',
       'coach_notes': '',
       'is_active': 1,
@@ -321,8 +334,10 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'beginner',
       'movement_pattern': 'horizontalPull',
       'laterality': 'bilateral',
-      'instructions': 'تنه را پایدار نگه دارید و دستگیره را با جمع‌کردن کتف‌ها به سمت بدن بکشید.',
-      'safety_notes': 'از تاب شدید تنه و جلوآمدن شانه‌ها در انتهای کشش جلوگیری شود.',
+      'instructions':
+          'تنه را پایدار نگه دارید و دستگیره را با جمع‌کردن کتف‌ها به سمت بدن بکشید.',
+      'safety_notes':
+          'از تاب شدید تنه و جلوآمدن شانه‌ها در انتهای کشش جلوگیری شود.',
       'coach_notes': '',
       'is_active': 1,
       'is_system': 1,
@@ -342,7 +357,8 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'advanced',
       'movement_pattern': 'verticalPull',
       'laterality': 'bilateral',
-      'instructions': 'از آویزان پایدار، بدن را با پایین‌آوردن کتف و خم‌کردن آرنج بالا بکشید.',
+      'instructions':
+          'از آویزان پایدار، بدن را با پایین‌آوردن کتف و خم‌کردن آرنج بالا بکشید.',
       'safety_notes': 'از تاب‌دادن کنترل‌نشده و دامنه دردناک شانه پرهیز شود.',
       'coach_notes': '',
       'is_active': 1,
@@ -363,7 +379,8 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'beginner',
       'movement_pattern': 'verticalPull',
       'laterality': 'bilateral',
-      'instructions': 'میله را با پایین‌آوردن کتف‌ها به سمت بالای سینه بکشید و کنترل‌شده بازگردانید.',
+      'instructions':
+          'میله را با پایین‌آوردن کتف‌ها به سمت بالای سینه بکشید و کنترل‌شده بازگردانید.',
       'safety_notes': 'میله پشت گردن کشیده نشود و تنه بیش‌ازحد عقب نرود.',
       'coach_notes': '',
       'is_active': 1,
@@ -384,7 +401,8 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'beginner',
       'movement_pattern': 'lunge',
       'laterality': 'alternating',
-      'instructions': 'یک پا را عقب ببرید، هر دو زانو را خم کنید و با فشار پای جلو بازگردید.',
+      'instructions':
+          'یک پا را عقب ببرید، هر دو زانو را خم کنید و با فشار پای جلو بازگردید.',
       'safety_notes': 'تعادل و هم‌جهتی زانوی جلو با پنجه حفظ شود.',
       'coach_notes': '',
       'is_active': 1,
@@ -405,8 +423,10 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'intermediate',
       'movement_pattern': 'hinge',
       'laterality': 'bilateral',
-      'instructions': 'پشت بالایی را روی نیمکت ثابت کنید و لگن را تا راستای کنترل‌شده بالا ببرید.',
-      'safety_notes': 'حرکت از لگن انجام شود و از بازکردن بیش‌ازحد کمر جلوگیری شود.',
+      'instructions':
+          'پشت بالایی را روی نیمکت ثابت کنید و لگن را تا راستای کنترل‌شده بالا ببرید.',
+      'safety_notes':
+          'حرکت از لگن انجام شود و از بازکردن بیش‌ازحد کمر جلوگیری شود.',
       'coach_notes': '',
       'is_active': 1,
       'is_system': 1,
@@ -426,7 +446,8 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'beginner',
       'movement_pattern': 'isolation',
       'laterality': 'bilateral',
-      'instructions': 'آرنج‌ها را نزدیک بدن ثابت نگه دارید و دمبل‌ها را بدون تاب تنه بالا بیاورید.',
+      'instructions':
+          'آرنج‌ها را نزدیک بدن ثابت نگه دارید و دمبل‌ها را بدون تاب تنه بالا بیاورید.',
       'safety_notes': 'دامنه و بار باید بدون درد آرنج و مچ باشد.',
       'coach_notes': '',
       'is_active': 1,
@@ -447,7 +468,8 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'beginner',
       'movement_pattern': 'isolation',
       'laterality': 'bilateral',
-      'instructions': 'آرنج‌ها را کنار تنه ثابت کنید و ساعدها را تا بازشدن کنترل‌شده پایین ببرید.',
+      'instructions':
+          'آرنج‌ها را کنار تنه ثابت کنید و ساعدها را تا بازشدن کنترل‌شده پایین ببرید.',
       'safety_notes': 'از جلوآمدن شانه و حرکت آرنج‌ها جلوگیری شود.',
       'coach_notes': '',
       'is_active': 1,
@@ -468,8 +490,10 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'beginner',
       'movement_pattern': 'isolation',
       'laterality': 'bilateral',
-      'instructions': 'پاشنه‌ها را با کنترل بالا ببرید، مکث کوتاه کنید و آهسته پایین بیاورید.',
-      'safety_notes': 'تعادل حفظ شود و از پرش یا ضربه در پایین دامنه پرهیز شود.',
+      'instructions':
+          'پاشنه‌ها را با کنترل بالا ببرید، مکث کوتاه کنید و آهسته پایین بیاورید.',
+      'safety_notes':
+          'تعادل حفظ شود و از پرش یا ضربه در پایین دامنه پرهیز شود.',
       'coach_notes': '',
       'is_active': 1,
       'is_system': 1,
@@ -489,7 +513,8 @@ ON $exercises (is_system DESC, is_active DESC, updated_at DESC)
       'difficulty': 'beginner',
       'movement_pattern': 'antiRotation',
       'laterality': 'bilateral',
-      'instructions': 'بدن را از سر تا پاشنه در خط نگه دارید و تنفس کنترل‌شده ادامه یابد.',
+      'instructions':
+          'بدن را از سر تا پاشنه در خط نگه دارید و تنفس کنترل‌شده ادامه یابد.',
       'safety_notes': 'کمر نباید فرو بیفتد و گردن در امتداد ستون فقرات بماند.',
       'coach_notes': '',
       'is_active': 1,

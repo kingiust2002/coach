@@ -136,7 +136,9 @@ class ExercisesController extends ChangeNotifier {
     )..remove(input.primaryMuscle);
 
     if (nameFa.length < 2 || nameFa.length > 100) {
-      throw const FormatException('نام فارسی حرکت باید بین ۲ تا ۱۰۰ نویسه باشد.');
+      throw const FormatException(
+        'نام فارسی حرکت باید بین ۲ تا ۱۰۰ نویسه باشد.',
+      );
     }
     if (nameEn.length > 120) {
       throw const FormatException('نام انگلیسی حرکت بیش از حد طولانی است.');
@@ -164,10 +166,9 @@ class ExercisesController extends ChangeNotifier {
   }
 
   static String _nameKey(String value) {
-    return InputNormalizer.singleLine(value)
-        .replaceAll('ي', 'ی')
-        .replaceAll('ك', 'ک')
-        .toLowerCase();
+    return InputNormalizer.singleLine(
+      value,
+    ).replaceAll('ي', 'ی').replaceAll('ك', 'ک').toLowerCase();
   }
 
   Future<void> _mutate(Future<void> Function() operation) async {

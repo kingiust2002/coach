@@ -21,9 +21,7 @@ class ExerciseDetailPage extends StatelessWidget {
       builder: (BuildContext context, Widget? child) {
         final Exercise? exercise = controller.byId(exerciseId);
         if (exercise == null) {
-          return const Scaffold(
-            body: Center(child: Text('حرکت پیدا نشد.')),
-          );
+          return const Scaffold(body: Center(child: Text('حرکت پیدا نشد.')));
         }
         return Scaffold(
           appBar: AppBar(
@@ -35,21 +33,18 @@ class ExerciseDetailPage extends StatelessWidget {
                   onPressed: controller.isMutating
                       ? null
                       : () => Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (BuildContext context) => ExerciseFormPage(
-                                controller: controller,
-                                exercise: exercise,
-                              ),
+                          MaterialPageRoute<void>(
+                            builder: (BuildContext context) => ExerciseFormPage(
+                              controller: controller,
+                              exercise: exercise,
                             ),
                           ),
+                        ),
                   icon: const Icon(Icons.edit_outlined),
                 ),
               PopupMenuButton<String>(
-                onSelected: (String value) => _handleAction(
-                  context,
-                  exercise,
-                  value,
-                ),
+                onSelected: (String value) =>
+                    _handleAction(context, exercise, value),
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                   PopupMenuItem<String>(
                     value: exercise.isActive ? 'archive' : 'restore',
@@ -87,8 +82,8 @@ class ExerciseDetailPage extends StatelessWidget {
                     exercise.secondaryMuscles.isEmpty
                         ? '—'
                         : exercise.secondaryMuscles
-                            .map((MuscleGroup item) => item.label)
-                            .join('، '),
+                              .map((MuscleGroup item) => item.label)
+                              .join('، '),
                   ),
                   MapEntry<String, String>('نوع حرکت', exercise.type.label),
                   MapEntry<String, String>('وسیله', exercise.equipment.label),
@@ -181,9 +176,9 @@ class ExerciseDetailPage extends StatelessWidget {
           : await controller.restore(exercise);
     } catch (_) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('عملیات انجام نشد.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('عملیات انجام نشد.')));
       }
     }
   }
@@ -216,10 +211,9 @@ class _Header extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         exercise.nameFa,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleLarge
-                            ?.copyWith(fontWeight: FontWeight.w800),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                       if (exercise.nameEn.isNotEmpty)
                         Text(
