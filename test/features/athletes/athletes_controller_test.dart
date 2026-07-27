@@ -124,7 +124,10 @@ void main() {
         notes: '',
       );
 
-      expect(() => controller.create(invalid), throwsA(isA<FormatException>()));
+      await expectLater(
+        controller.create(invalid),
+        throwsA(isA<FormatException>()),
+      );
       expect(repository.items, isEmpty);
     },
   );
