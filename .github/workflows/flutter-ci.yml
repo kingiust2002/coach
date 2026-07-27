@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write
+  contents: read
   issues: write
   pull-requests: write
 
@@ -19,39 +19,6 @@ env:
   FLUTTER_VERSION: 3.32.6
 
 jobs:
-  cleanup-phase2:
-    if: github.event_name == 'pull_request' && github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Checkout working branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-
-      - name: Set up Flutter baseline
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: stable
-          cache: true
-
-      - name: Apply and validate cleanup
-        run: |
-          python3 tool/phase2_cleanup.py
-          dart format lib test
-          flutter pub get
-          flutter analyze --no-fatal-infos
-
-      - name: Commit cleanup
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          rm tool/phase2_cleanup.py
-          git add lib test tool/phase2_cleanup.py
-          git commit -m "refactor: remove deprecated Flutter APIs"
-          git push origin HEAD:${{ github.event.pull_request.head.ref }}
-
   android-verify:
     runs-on: ubuntu-latest
     timeout-minutes: 30
