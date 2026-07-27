@@ -266,7 +266,7 @@ class _ProfileHeader extends StatelessWidget {
           end: Alignment.bottomLeft,
           colors: <Color>[
             colors.primaryContainer,
-            colors.secondaryContainer.withOpacity(0.72),
+            colors.secondaryContainer.withValues(alpha: 0.72),
           ],
         ),
         borderRadius: BorderRadius.circular(26),
@@ -346,7 +346,7 @@ class _StatusPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
       decoration: BoxDecoration(
-        color: colors.surface.withOpacity(0.78),
+        color: colors.surface.withValues(alpha: 0.78),
         borderRadius: BorderRadius.circular(99),
       ),
       child: Row(
@@ -523,7 +523,7 @@ class _FutureFeature extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerHighest.withOpacity(0.55),
+        color: colors.surfaceContainerHighest.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(

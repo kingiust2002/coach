@@ -86,10 +86,11 @@ class _ExerciseFormPageState extends State<ExerciseFormPage> {
           return;
         }
         final bool discard = await _confirmDiscard();
-        if (discard && mounted) {
-          setState(() => _dirty = false);
-          Navigator.of(context).pop();
+        if (!discard || !context.mounted) {
+          return;
         }
+        setState(() => _dirty = false);
+        Navigator.of(context).pop();
       },
       child: Scaffold(
         appBar: AppBar(

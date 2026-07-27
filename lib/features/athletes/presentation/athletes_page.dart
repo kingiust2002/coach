@@ -294,7 +294,7 @@ class _FilterChip extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
               decoration: BoxDecoration(
                 color: selected
-                    ? colors.primary.withOpacity(0.12)
+                    ? colors.primary.withValues(alpha: 0.12)
                     : colors.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(99),
               ),
@@ -434,7 +434,7 @@ class _MiniTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerHighest.withOpacity(0.55),
+        color: colors.surfaceContainerHighest.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(99),
       ),
       child: Row(

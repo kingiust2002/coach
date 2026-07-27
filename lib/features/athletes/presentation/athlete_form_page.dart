@@ -88,8 +88,19 @@ class _AthleteFormPageState extends State<AthleteFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _confirmDiscard,
+    return PopScope<Object?>(
+      canPop: !_dirty,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop || _saving || !_dirty) {
+          return;
+        }
+        final bool discard = await _confirmDiscard();
+        if (!discard || !context.mounted) {
+          return;
+        }
+        setState(() => _dirty = false);
+        Navigator.of(context).pop();
+      },
       child: Scaffold(
         appBar: AppBar(
           title: Text(_isEditing ? 'ویرایش پرونده شاگرد' : 'پرونده شاگرد جدید'),
@@ -679,7 +690,7 @@ class _DateSelectionField extends StatelessWidget {
       child: Ink(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: colors.surfaceContainerHighest.withOpacity(0.48),
+          color: colors.surfaceContainerHighest.withValues(alpha: 0.48),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: colors.outlineVariant),
         ),

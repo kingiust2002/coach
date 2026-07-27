@@ -58,8 +58,8 @@ class AppSelectionField<T> extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
             color: enabled
-                ? colors.surfaceContainerHighest.withOpacity(0.48)
-                : colors.surfaceContainerHighest.withOpacity(0.24),
+                ? colors.surfaceContainerHighest.withValues(alpha: 0.48)
+                : colors.surfaceContainerHighest.withValues(alpha: 0.24),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: colors.outlineVariant),
           ),
@@ -288,7 +288,7 @@ class _SelectionTile<T> extends StatelessWidget {
                 height: 42,
                 decoration: BoxDecoration(
                   color: selected
-                      ? colors.primary.withOpacity(0.12)
+                      ? colors.primary.withValues(alpha: 0.12)
                       : colors.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(13),
                 ),
