@@ -37,22 +37,25 @@ class SqliteExerciseMediaRepository implements ExerciseMediaRepository {
 
   @override
   Future<void> saveMedia(ExerciseMedia media) async {
-    final Database db = await _database.open();
-    await db.insert(
-      ExerciseMediaSchema.mediaTable,
-      media.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _database.transaction((Transaction txn) async {
+      await _upsert(
+        txn,
+        table: ExerciseMediaSchema.mediaTable,
+        id: media.exerciseId,
+        values: media.toMap(),
+      );
+    });
   }
 
   @override
   Future<void> saveAllMedia(Iterable<ExerciseMedia> media) async {
     await _database.transaction((Transaction txn) async {
       for (final ExerciseMedia item in media) {
-        await txn.insert(
-          ExerciseMediaSchema.mediaTable,
-          item.toMap(),
-          conflictAlgorithm: ConflictAlgorithm.replace,
+        await _upsert(
+          txn,
+          table: ExerciseMediaSchema.mediaTable,
+          id: item.exerciseId,
+          values: item.toMap(),
         );
       }
     });
@@ -85,12 +88,14 @@ class SqliteExerciseMediaRepository implements ExerciseMediaRepository {
 
   @override
   Future<void> saveDownload(ExerciseMediaDownload download) async {
-    final Database db = await _database.open();
-    await db.insert(
-      ExerciseMediaSchema.downloadsTable,
-      download.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _database.transaction((Transaction txn) async {
+      await _upsert(
+        txn,
+        table: ExerciseMediaSchema.downloadsTable,
+        id: download.exerciseId,
+        values: download.toMap(),
+      );
+    });
   }
 
   @override
@@ -101,5 +106,27 @@ class SqliteExerciseMediaRepository implements ExerciseMediaRepository {
       where: 'exercise_id = ?',
       whereArgs: <Object?>[exerciseId],
     );
+  }
+
+  Future<void> _upsert(
+    DatabaseExecutor executor, {
+    required String table,
+    required String id,
+    required Map<String, Object?> values,
+  }) async {
+    final int updated = await executor.update(
+      table,
+      values,
+      where: 'exercise_id = ?',
+      whereArgs: <Object?>[id],
+      conflictAlgorithm: ConflictAlgorithm.abort,
+    );
+    if (updated == 0) {
+      await executor.insert(
+        table,
+        values,
+        conflictAlgorithm: ConflictAlgorithm.abort,
+      );
+    }
   }
 }
