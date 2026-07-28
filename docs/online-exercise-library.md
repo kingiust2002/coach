@@ -14,13 +14,23 @@
 - Cloudflare R2 Free: فایل‌های MP4 و تصاویر اختیاری.
 - یک فایل Manifest عمومی و نسخه‌بندی‌شده، فهرست حرکات منتشرشده را به اپ می‌دهد.
 
-این تفکیک باعث می‌شود سقف کوچک Storage و Egress پلن رایگان Supabase برای ویدئو مصرف نشود. اپ با متغیر زیر به Manifest متصل می‌شود:
+آدرس عمومی فعلی محیط توسعه:
+
+```text
+https://pub-b9ff919dee094104aea521394068477a.r2.dev
+```
+
+Manifest پیش‌فرض برنامه:
+
+```text
+https://pub-b9ff919dee094104aea521394068477a.r2.dev/catalog/v1.json
+```
+
+برای محیط staging یا production می‌توان آدرس پیش‌فرض را هنگام Build بازنویسی کرد:
 
 ```text
 --dart-define=EXERCISE_CATALOG_URL=https://media.example.com/catalog/v1.json
 ```
-
-در صورت نبود این متغیر، کتابخانه محلی بدون خطا کار می‌کند و دکمه همگام‌سازی غیرفعال می‌ماند.
 
 پلن رایگان برای شروع و آزمایش بازار مناسب است، نه یک تضمین دائمی برای هر تعداد کاربر. مصرف فضای R2، تعداد درخواست‌ها و حجم دیتابیس باید پایش شود تا پیش از رسیدن به سقف، فشرده‌سازی یا ارتقای پلن انجام شود.
 
@@ -54,8 +64,8 @@
         "updated_at": "2026-07-28T08:00:00.000Z"
       },
       "media": {
-        "videoUrl": "https://media.example.com/videos/back-squat-v1.mp4",
-        "posterUrl": "https://media.example.com/images/back-squat-start.webp",
+        "videoUrl": "https://pub-b9ff919dee094104aea521394068477a.r2.dev/videos/sys_back_squat-v1.mp4",
+        "posterUrl": "https://pub-b9ff919dee094104aea521394068477a.r2.dev/images/sys_back_squat-start.webp",
         "secondaryImageUrl": "",
         "videoSizeBytes": 4194304,
         "durationSeconds": 72,
