@@ -34,6 +34,8 @@ class _AppBootstrapState extends State<AppBootstrap> {
           return CoachApp(
             athleteRepository: dependencies.athleteRepository,
             exerciseRepository: dependencies.exerciseRepository,
+            exerciseMediaRepository: dependencies.exerciseMediaRepository,
+            exerciseMediaDownloader: dependencies.exerciseMediaDownloader,
           );
         }
 
