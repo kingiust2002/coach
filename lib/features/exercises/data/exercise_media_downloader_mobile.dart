@@ -112,10 +112,8 @@ class MobileExerciseMediaDownloader implements ExerciseMediaDownloader {
     }
   }
 
-  String _safeName(String value) => value.replaceAll(
-    RegExp(r'[^a-zA-Z0-9_-]'),
-    '_',
-  );
+  String _safeName(String value) =>
+      value.replaceAll(RegExp(r'[^a-zA-Z0-9_-]'), '_');
 
   String _safeExtension(String path) {
     final String extension = p.extension(path).toLowerCase();

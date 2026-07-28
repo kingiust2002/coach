@@ -82,7 +82,9 @@ class ExerciseCatalogClient {
 
       final Object? rawMedia = rawItem['media'];
       if (rawMedia is Map<dynamic, dynamic>) {
-        final Map<String, Object?> mediaMap = Map<String, Object?>.from(rawMedia);
+        final Map<String, Object?> mediaMap = Map<String, Object?>.from(
+          rawMedia,
+        );
         mediaMap['exerciseId'] = exercise.id;
         media.add(ExerciseMedia.fromManifest(mediaMap));
       }
