@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 
 import '../domain/exercise.dart';
 import 'exercise_form_page.dart';
+import 'exercise_media_card.dart';
+import 'exercise_media_controller.dart';
 import 'exercises_controller.dart';
 
 class ExerciseDetailPage extends StatelessWidget {
   const ExerciseDetailPage({
     required this.exerciseId,
     required this.controller,
+    required this.mediaController,
     super.key,
   });
 
   final String exerciseId;
   final ExercisesController controller;
+  final ExerciseMediaController mediaController;
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +72,11 @@ class ExerciseDetailPage extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
             children: <Widget>[
               _Header(exercise: exercise),
+              const SizedBox(height: 16),
+              ExerciseMediaCard(
+                exercise: exercise,
+                controller: mediaController,
+              ),
               const SizedBox(height: 16),
               _InfoSection(
                 title: 'طبقه‌بندی',

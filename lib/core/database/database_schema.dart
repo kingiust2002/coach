@@ -1,6 +1,6 @@
 abstract final class DatabaseSchema {
   static const String fileName = 'coach_app.db';
-  static const int version = 3;
+  static const int version = 4;
 
   static const String athletes = 'athletes';
   static const String exercises = 'exercises';
