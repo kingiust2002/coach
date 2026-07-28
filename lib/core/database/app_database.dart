@@ -1,6 +1,7 @@
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
+import '../../features/exercises/data/exercise_media_schema.dart';
 import 'database_schema.dart';
 
 class AppDatabase {
@@ -21,7 +22,7 @@ class AppDatabase {
 
     final Database database = await openDatabase(
       path,
-      version: DatabaseSchema.version,
+      version: ExerciseMediaSchema.databaseVersion,
       singleInstance: true,
       onConfigure: (Database db) async {
         await db.execute('PRAGMA foreign_keys = ON');
@@ -31,6 +32,7 @@ class AppDatabase {
         // transaction here can deadlock before the first Flutter frame.
         await _createAthletes(db);
         await _createExercises(db);
+        await _createExerciseMedia(db);
       },
       onUpgrade: _upgrade,
       onDowngrade: (Database db, int oldVersion, int newVersion) async {
@@ -69,6 +71,9 @@ class AppDatabase {
       case 3:
         await _createExercises(executor);
         return;
+      case 4:
+        await _createExerciseMedia(executor);
+        return;
       default:
         throw StateError(
           'Migration for database version $targetVersion is missing.',
@@ -94,6 +99,14 @@ class AppDatabase {
         seed,
         conflictAlgorithm: ConflictAlgorithm.ignore,
       );
+    }
+  }
+
+  static Future<void> _createExerciseMedia(
+    DatabaseExecutor executor,
+  ) async {
+    for (final String statement in ExerciseMediaSchema.migrateToV4) {
+      await executor.execute(statement);
     }
   }
 
