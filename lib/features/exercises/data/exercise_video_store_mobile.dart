@@ -76,7 +76,9 @@ class MobileExerciseVideoStore implements ExerciseVideoStore {
         output.add(chunk);
         received += chunk.length;
         if (total != null && total > 0) {
-          onProgress?.call((received / total).clamp(0, 1));
+          onProgress?.call(
+            (received / total).clamp(0.0, 1.0).toDouble(),
+          );
         }
       }
       await output.flush();
