@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/utils/persian_date_formatter.dart';
 import '../domain/exercise.dart';
+import '../domain/exercise_media.dart';
 import 'exercise_form_page.dart';
+import 'exercise_video_page.dart';
 import 'exercises_controller.dart';
 
 class ExerciseDetailPage extends StatelessWidget {
@@ -69,6 +72,11 @@ class ExerciseDetailPage extends StatelessWidget {
             children: <Widget>[
               _Header(exercise: exercise),
               const SizedBox(height: 16),
+              _ExerciseVideoSection(
+                exercise: exercise,
+                controller: controller,
+              ),
+              const SizedBox(height: 16),
               _InfoSection(
                 title: 'طبقه‌بندی',
                 icon: Icons.category_outlined,
@@ -129,7 +137,9 @@ class ExerciseDetailPage extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(
-                    'شناسه پایدار حرکت: ${exercise.id}\nاین شناسه در برنامه‌ساز ذخیره می‌شود و بایگانی حرکت، برنامه‌های قبلی را نمی‌شکند.',
+                    'شناسه پایدار حرکت: ${exercise.id}\n'
+                    'آخرین بروزرسانی: ${PersianDateFormatter.dateTime(exercise.updatedAt)}\n'
+                    'بایگانی حرکت، برنامه‌ها و دانلودهای قبلی را نمی‌شکند.',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
@@ -184,6 +194,224 @@ class ExerciseDetailPage extends StatelessWidget {
   }
 }
 
+class _ExerciseVideoSection extends StatelessWidget {
+  const _ExerciseVideoSection({
+    required this.exercise,
+    required this.controller,
+  });
+
+  final Exercise exercise;
+  final ExercisesController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final ExerciseMedia? media = controller.mediaFor(exercise.id);
+    final ExerciseVideoDownload? download = controller.downloadFor(exercise.id);
+    final double? progress = controller.downloadProgressFor(exercise.id);
+    final Object? operationError = controller.mediaOperationErrorFor(
+      exercise.id,
+    );
+    final bool busy = controller.isMediaOperationRunning(exercise.id);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            const _SectionTitle(
+              title: 'ویدیوی کامل آموزش حرکت',
+              icon: Icons.ondemand_video_outlined,
+            ),
+            const SizedBox(height: 12),
+            if (controller.isMediaLoading && media == null)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            else if (media == null) ...<Widget>[
+              const Text(
+                'برای این حرکت هنوز ویدیوی کامل در کتابخانه آنلاین منتشر نشده است. هیچ کلیپ کوتاه یا ویدیوی میانی داخل برنامه قرار نمی‌گیرد.',
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: controller.isMediaLoading
+                    ? null
+                    : controller.refreshMedia,
+                icon: const Icon(Icons.sync_rounded),
+                label: const Text('بروزرسانی کتابخانه آنلاین'),
+              ),
+              if (controller.mediaError != null) ...<Widget>[
+                const SizedBox(height: 8),
+                Text(
+                  'اتصال به کتابخانه انجام نشد؛ اطلاعات ذخیره‌شده آفلاین همچنان قابل استفاده است.',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                ),
+              ],
+            ] else ...<Widget>[
+              Text(
+                download == null
+                    ? 'ویدیو آماده پخش آنلاین است و فقط با انتخاب کاربر دانلود می‌شود.'
+                    : 'ویدیو روی این دستگاه برای استفاده آفلاین ذخیره شده است.',
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: <Widget>[
+                  Chip(label: Text('نسخه ${media.version}')),
+                  if (media.durationSeconds != null)
+                    Chip(label: Text(_duration(media.durationSeconds!))),
+                  if (media.sizeBytes != null)
+                    Chip(label: Text(_bytes(media.sizeBytes!))),
+                  if (download != null)
+                    const Chip(
+                      avatar: Icon(Icons.offline_pin_outlined, size: 18),
+                      label: Text('دانلودشده'),
+                    ),
+                ],
+              ),
+              if (progress != null) ...<Widget>[
+                const SizedBox(height: 12),
+                LinearProgressIndicator(value: progress),
+                const SizedBox(height: 6),
+                Text('در حال دانلود: ${(progress * 100).round()}٪'),
+              ],
+              if (operationError != null) ...<Widget>[
+                const SizedBox(height: 10),
+                Text(
+                  operationError.toString(),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                ),
+              ],
+              const SizedBox(height: 14),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: <Widget>[
+                  FilledButton.icon(
+                    onPressed: busy
+                        ? null
+                        : () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (BuildContext context) =>
+                                  ExerciseVideoPage(
+                                    title: exercise.nameFa,
+                                    media: media,
+                                    download: download,
+                                  ),
+                            ),
+                          ),
+                    icon: Icon(
+                      download == null
+                          ? Icons.play_circle_outline_rounded
+                          : Icons.offline_pin_outlined,
+                    ),
+                    label: Text(
+                      download == null ? 'پخش آنلاین' : 'پخش آفلاین',
+                    ),
+                  ),
+                  if (controller.videoDownloadsSupported && download == null)
+                    OutlinedButton.icon(
+                      onPressed: busy
+                          ? null
+                          : () => _download(context, media.exerciseId),
+                      icon: const Icon(Icons.download_rounded),
+                      label: const Text('دانلود برای آفلاین'),
+                    ),
+                  if (controller.videoDownloadsSupported && download != null)
+                    OutlinedButton.icon(
+                      onPressed: busy
+                          ? null
+                          : () => _delete(context, media.exerciseId),
+                      icon: const Icon(Icons.delete_outline_rounded),
+                      label: const Text('حذف دانلود'),
+                    ),
+                ],
+              ),
+              if (!controller.videoDownloadsSupported) ...<Widget>[
+                const SizedBox(height: 10),
+                const Text(
+                  'در پیش‌نمایش وب فقط پخش آنلاین فعال است. دانلود آفلاین در APK اندروید در دسترس خواهد بود.',
+                ),
+              ],
+              const SizedBox(height: 10),
+              const Text(
+                'تصاویر و ویدیوها داخل APK عمومی بسته‌بندی نمی‌شوند؛ در نتیجه حجم نصب اولیه پایین می‌ماند.',
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _download(BuildContext context, String exerciseId) async {
+    try {
+      await controller.downloadVideo(exerciseId);
+    } catch (error) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('دانلود انجام نشد: $error')),
+        );
+      }
+    }
+  }
+
+  Future<void> _delete(BuildContext context, String exerciseId) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('حذف ویدیوی آفلاین'),
+        content: const Text(
+          'فقط فایل دانلودشده از گوشی حذف می‌شود و حرکت در کتابخانه باقی می‌ماند.',
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('انصراف'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('حذف'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) {
+      return;
+    }
+    try {
+      await controller.deleteDownloadedVideo(exerciseId);
+    } catch (error) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('حذف فایل انجام نشد: $error')),
+        );
+      }
+    }
+  }
+
+  static String _duration(int seconds) {
+    final int minutes = seconds ~/ 60;
+    final int remaining = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${remaining.toString().padLeft(2, '0')}';
+  }
+
+  static String _bytes(int value) {
+    if (value >= 1024 * 1024) {
+      return '${(value / (1024 * 1024)).toStringAsFixed(1)} مگابایت';
+    }
+    return '${(value / 1024).toStringAsFixed(0)} کیلوبایت';
+  }
+}
+
 class _Header extends StatelessWidget {
   const _Header({required this.exercise});
 
@@ -200,9 +428,9 @@ class _Header extends StatelessWidget {
           children: <Widget>[
             Row(
               children: <Widget>[
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 28,
-                  child: const Icon(Icons.fitness_center_rounded),
+                  child: Icon(Icons.fitness_center_rounded),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
