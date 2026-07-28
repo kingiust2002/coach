@@ -19,7 +19,7 @@ class MobileExerciseMediaDownloader implements ExerciseMediaDownloader {
     required ExerciseDownloadProgress onProgress,
   }) async {
     if (!media.hasVideo) {
-      throw const StateError('این حرکت ویدئوی قابل دانلود ندارد.');
+      throw StateError('این حرکت ویدئوی قابل دانلود ندارد.');
     }
 
     final Directory root = await getApplicationDocumentsDirectory();
@@ -112,8 +112,10 @@ class MobileExerciseMediaDownloader implements ExerciseMediaDownloader {
     }
   }
 
-  String _safeName(String value) =>
-      value.replaceAll(RegExp(r'[^a-zA-Z0-9_-]'), '_');
+  String _safeName(String value) => value.replaceAll(
+    RegExp(r'[^a-zA-Z0-9_-]'),
+    '_',
+  );
 
   String _safeExtension(String path) {
     final String extension = p.extension(path).toLowerCase();
