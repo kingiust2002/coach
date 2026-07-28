@@ -1,7 +1,9 @@
 import 'package:coach_app/app/coach_app.dart';
 import 'package:coach_app/features/athletes/data/athlete_repository.dart';
 import 'package:coach_app/features/athletes/domain/athlete.dart';
+import 'package:coach_app/features/exercises/data/exercise_media_downloader_web.dart';
 import 'package:coach_app/features/exercises/data/exercise_repository.dart';
+import 'package:coach_app/features/exercises/data/memory_exercise_media_repository.dart';
 import 'package:coach_app/features/exercises/domain/exercise.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -54,6 +56,8 @@ void main() {
       CoachApp(
         athleteRepository: _FakeAthleteRepository(),
         exerciseRepository: _FakeExerciseRepository(),
+        exerciseMediaRepository: MemoryExerciseMediaRepository(),
+        exerciseMediaDownloader: const WebExerciseMediaDownloader(),
       ),
     );
     await tester.pumpAndSettle();
