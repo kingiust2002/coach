@@ -33,7 +33,7 @@ class ExerciseCatalogClient {
   Future<ExerciseCatalogSnapshot> fetch() async {
     final Uri? uri = Uri.tryParse(manifestUrl);
     if (uri == null || !uri.hasScheme) {
-      throw const StateError(
+      throw StateError(
         'آدرس کتابخانه آنلاین تنظیم نشده است. EXERCISE_CATALOG_URL را مشخص کنید.',
       );
     }
@@ -82,9 +82,7 @@ class ExerciseCatalogClient {
 
       final Object? rawMedia = rawItem['media'];
       if (rawMedia is Map<dynamic, dynamic>) {
-        final Map<String, Object?> mediaMap = Map<String, Object?>.from(
-          rawMedia,
-        );
+        final Map<String, Object?> mediaMap = Map<String, Object?>.from(rawMedia);
         mediaMap['exerciseId'] = exercise.id;
         media.add(ExerciseMedia.fromManifest(mediaMap));
       }
