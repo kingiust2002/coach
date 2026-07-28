@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../athletes/presentation/athletes_controller.dart';
 import '../../athletes/presentation/athletes_page.dart';
+import '../../exercises/presentation/exercise_media_controller.dart';
 import '../../exercises/presentation/exercises_controller.dart';
 import '../../exercises/presentation/exercises_page.dart';
 
@@ -9,11 +10,13 @@ class AppShell extends StatefulWidget {
   const AppShell({
     required this.athletesController,
     required this.exercisesController,
+    required this.exerciseMediaController,
     super.key,
   });
 
   final AthletesController athletesController;
   final ExercisesController exercisesController;
+  final ExerciseMediaController exerciseMediaController;
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -28,11 +31,15 @@ class _AppShellState extends State<AppShell> {
       _Dashboard(
         athletesController: widget.athletesController,
         exercisesController: widget.exercisesController,
+        exerciseMediaController: widget.exerciseMediaController,
         openAthletes: () => setState(() => _index = 1),
         openExercises: () => setState(() => _index = 2),
       ),
       AthletesPage(controller: widget.athletesController),
-      ExercisesPage(controller: widget.exercisesController),
+      ExercisesPage(
+        controller: widget.exercisesController,
+        mediaController: widget.exerciseMediaController,
+      ),
       const _ComingSoon(
         title: 'برنامه‌ها',
         description:
@@ -89,12 +96,14 @@ class _Dashboard extends StatelessWidget {
   const _Dashboard({
     required this.athletesController,
     required this.exercisesController,
+    required this.exerciseMediaController,
     required this.openAthletes,
     required this.openExercises,
   });
 
   final AthletesController athletesController;
   final ExercisesController exercisesController;
+  final ExerciseMediaController exerciseMediaController;
   final VoidCallback openAthletes;
   final VoidCallback openExercises;
 
@@ -104,6 +113,7 @@ class _Dashboard extends StatelessWidget {
       animation: Listenable.merge(<Listenable>[
         athletesController,
         exercisesController,
+        exerciseMediaController,
       ]),
       builder: (BuildContext context, Widget? child) {
         return ListView(
@@ -141,6 +151,12 @@ class _Dashboard extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+            _InfoCard(
+              title: 'کتابخانه آنلاین با دانلود انتخابی',
+              description:
+                  '${exerciseMediaController.media.length} حرکت دارای رسانه و ${exerciseMediaController.downloads.length} ویدئو برای استفاده آفلاین ذخیره شده است. هیچ ویدئویی بدون انتخاب کاربر دانلود نمی‌شود.',
             ),
             const SizedBox(height: 16),
             _InfoCard(
