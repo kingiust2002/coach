@@ -7,7 +7,8 @@ class MemoryExerciseMediaRepository implements ExerciseMediaRepository {
       <String, ExerciseMediaDownload>{};
 
   @override
-  Future<ExerciseMedia?> getMedia(String exerciseId) async => _media[exerciseId];
+  Future<ExerciseMedia?> getMedia(String exerciseId) async =>
+      _media[exerciseId];
 
   @override
   Future<Map<String, ExerciseMedia>> getAllMedia() async =>

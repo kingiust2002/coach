@@ -66,10 +66,7 @@ class _CoachAppState extends State<CoachApp> {
       debugShowCheckedModeBanner: false,
       title: 'مربی‌یار',
       locale: const Locale('fa', 'IR'),
-      supportedLocales: const <Locale>[
-        Locale('fa', 'IR'),
-        Locale('en', 'US'),
-      ],
+      supportedLocales: const <Locale>[Locale('fa', 'IR'), Locale('en', 'US')],
       localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
         PersianMaterialLocalizations.delegate,
         PersianCupertinoLocalizations.delegate,

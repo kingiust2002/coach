@@ -4,7 +4,8 @@ abstract final class ExerciseMediaSchema {
   static const String mediaTable = 'exercise_media';
   static const String downloadsTable = 'exercise_media_downloads';
 
-  static const String createMediaTable = '''
+  static const String createMediaTable =
+      '''
 CREATE TABLE $mediaTable (
   exercise_id TEXT PRIMARY KEY,
   video_url TEXT NOT NULL DEFAULT '',
@@ -18,7 +19,8 @@ CREATE TABLE $mediaTable (
 )
 ''';
 
-  static const String createDownloadsTable = '''
+  static const String createDownloadsTable =
+      '''
 CREATE TABLE $downloadsTable (
   exercise_id TEXT PRIMARY KEY,
   remote_url TEXT NOT NULL,
@@ -31,12 +33,14 @@ CREATE TABLE $downloadsTable (
 )
 ''';
 
-  static const String mediaUpdatedIndex = '''
+  static const String mediaUpdatedIndex =
+      '''
 CREATE INDEX idx_exercise_media_updated
 ON $mediaTable (updated_at DESC)
 ''';
 
-  static const String downloadsUpdatedIndex = '''
+  static const String downloadsUpdatedIndex =
+      '''
 CREATE INDEX idx_exercise_media_downloads_updated
 ON $downloadsTable (updated_at DESC)
 ''';

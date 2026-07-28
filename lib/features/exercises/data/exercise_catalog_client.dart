@@ -20,12 +20,10 @@ class ExerciseCatalogSnapshot {
 }
 
 class ExerciseCatalogClient {
-  ExerciseCatalogClient({
-    String? manifestUrl,
-    http.Client? client,
-  }) : manifestUrl = manifestUrl ??
-            const String.fromEnvironment('EXERCISE_CATALOG_URL'),
-       _client = client ?? http.Client();
+  ExerciseCatalogClient({String? manifestUrl, http.Client? client})
+    : manifestUrl =
+          manifestUrl ?? const String.fromEnvironment('EXERCISE_CATALOG_URL'),
+      _client = client ?? http.Client();
 
   final String manifestUrl;
   final http.Client _client;
@@ -84,7 +82,9 @@ class ExerciseCatalogClient {
 
       final Object? rawMedia = rawItem['media'];
       if (rawMedia is Map<dynamic, dynamic>) {
-        final Map<String, Object?> mediaMap = Map<String, Object?>.from(rawMedia);
+        final Map<String, Object?> mediaMap = Map<String, Object?>.from(
+          rawMedia,
+        );
         mediaMap['exerciseId'] = exercise.id;
         media.add(ExerciseMedia.fromManifest(mediaMap));
       }

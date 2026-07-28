@@ -76,8 +76,8 @@ class ExerciseMediaController extends ChangeNotifier {
     notifyListeners();
     try {
       _media = await _mediaRepository.getAllMedia();
-      final Map<String, ExerciseMediaDownload> stored =
-          await _mediaRepository.getAllDownloads();
+      final Map<String, ExerciseMediaDownload> stored = await _mediaRepository
+          .getAllDownloads();
       final Map<String, ExerciseMediaDownload> valid =
           <String, ExerciseMediaDownload>{};
       for (final MapEntry<String, ExerciseMediaDownload> entry
@@ -128,9 +128,7 @@ class ExerciseMediaController extends ChangeNotifier {
 
   Future<void> download(ExerciseMedia item) async {
     if (!_downloader.isSupported) {
-      throw UnsupportedError(
-        'دانلود آفلاین در این محیط پشتیبانی نمی‌شود.',
-      );
+      throw UnsupportedError('دانلود آفلاین در این محیط پشتیبانی نمی‌شود.');
     }
     if (!item.hasVideo || _downloading.contains(item.exerciseId)) {
       return;

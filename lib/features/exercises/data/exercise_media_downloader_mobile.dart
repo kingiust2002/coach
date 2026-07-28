@@ -29,7 +29,8 @@ class MobileExerciseMediaDownloader implements ExerciseMediaDownloader {
     await directory.create(recursive: true);
 
     final String extension = _safeExtension(Uri.parse(media.videoUrl).path);
-    final String fileName = '${_safeName(media.exerciseId)}_v${media.version}$extension';
+    final String fileName =
+        '${_safeName(media.exerciseId)}_v${media.version}$extension';
     final File destination = File(p.join(directory.path, fileName));
     final File temporary = File('${destination.path}.part');
     if (await temporary.exists()) {
@@ -39,8 +40,13 @@ class MobileExerciseMediaDownloader implements ExerciseMediaDownloader {
     final HttpClient client = HttpClient()
       ..connectionTimeout = const Duration(seconds: 20);
     try {
-      final HttpClientRequest request = await client.getUrl(Uri.parse(media.videoUrl));
-      request.headers.set(HttpHeaders.acceptHeader, 'video/mp4,video/*;q=0.9,*/*;q=0.1');
+      final HttpClientRequest request = await client.getUrl(
+        Uri.parse(media.videoUrl),
+      );
+      request.headers.set(
+        HttpHeaders.acceptHeader,
+        'video/mp4,video/*;q=0.9,*/*;q=0.1',
+      );
       final HttpClientResponse response = await request.close();
       if (response.statusCode < 200 || response.statusCode >= 300) {
         throw HttpException(
@@ -51,7 +57,9 @@ class MobileExerciseMediaDownloader implements ExerciseMediaDownloader {
 
       final IOSink sink = temporary.openWrite();
       int received = 0;
-      final int? total = response.contentLength > 0 ? response.contentLength : null;
+      final int? total = response.contentLength > 0
+          ? response.contentLength
+          : null;
       try {
         await for (final List<int> chunk in response) {
           sink.add(chunk);
@@ -104,10 +112,8 @@ class MobileExerciseMediaDownloader implements ExerciseMediaDownloader {
     }
   }
 
-  String _safeName(String value) => value.replaceAll(
-    RegExp(r'[^a-zA-Z0-9_-]'),
-    '_',
-  );
+  String _safeName(String value) =>
+      value.replaceAll(RegExp(r'[^a-zA-Z0-9_-]'), '_');
 
   String _safeExtension(String path) {
     final String extension = p.extension(path).toLowerCase();

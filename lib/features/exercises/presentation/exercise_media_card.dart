@@ -86,11 +86,7 @@ class ExerciseMediaCard extends StatelessWidget {
                           FilledButton.icon(
                             onPressed: downloading
                                 ? null
-                                : () => _openVideo(
-                                    context,
-                                    media,
-                                    download,
-                                  ),
+                                : () => _openVideo(context, media, download),
                             icon: Icon(
                               download == null
                                   ? Icons.play_circle_outline_rounded
@@ -102,8 +98,7 @@ class ExerciseMediaCard extends StatelessWidget {
                           ),
                           if (download == null)
                             OutlinedButton.icon(
-                              onPressed:
-                                  downloading || !controller.canDownload
+                              onPressed: downloading || !controller.canDownload
                                   ? null
                                   : () => _download(context, media),
                               icon: const Icon(Icons.download_rounded),
@@ -167,9 +162,9 @@ class ExerciseMediaCard extends StatelessWidget {
       }
     } catch (error) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_friendlyError(error))),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(_friendlyError(error))));
       }
     }
   }
@@ -200,10 +195,7 @@ class ExerciseMediaCard extends StatelessWidget {
     await controller.deleteDownload(exercise.id);
   }
 
-  String _mediaSummary(
-    ExerciseMedia media,
-    ExerciseMediaDownload? download,
-  ) {
+  String _mediaSummary(ExerciseMedia media, ExerciseMediaDownload? download) {
     final List<String> parts = <String>[];
     final int? duration = media.durationSeconds;
     if (duration != null && duration > 0) {

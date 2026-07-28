@@ -130,11 +130,14 @@ class _ExerciseVideoPageState extends State<ExerciseVideoPage> {
                         children: <Widget>[
                           IconButton(
                             tooltip: '۱۰ ثانیه عقب',
-                            onPressed: () => _seekBy(const Duration(seconds: -10)),
+                            onPressed: () =>
+                                _seekBy(const Duration(seconds: -10)),
                             icon: const Icon(Icons.replay_10_rounded),
                           ),
                           IconButton.filled(
-                            tooltip: _controller.value.isPlaying ? 'توقف' : 'پخش',
+                            tooltip: _controller.value.isPlaying
+                                ? 'توقف'
+                                : 'پخش',
                             onPressed: () {
                               _controller.value.isPlaying
                                   ? _controller.pause()
@@ -149,7 +152,8 @@ class _ExerciseVideoPageState extends State<ExerciseVideoPage> {
                           ),
                           IconButton(
                             tooltip: '۱۰ ثانیه جلو',
-                            onPressed: () => _seekBy(const Duration(seconds: 10)),
+                            onPressed: () =>
+                                _seekBy(const Duration(seconds: 10)),
                             icon: const Icon(Icons.forward_10_rounded),
                           ),
                           const Spacer(),

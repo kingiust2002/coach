@@ -102,9 +102,7 @@ class AppDatabase {
     }
   }
 
-  static Future<void> _createExerciseMedia(
-    DatabaseExecutor executor,
-  ) async {
+  static Future<void> _createExerciseMedia(DatabaseExecutor executor) async {
     for (final String statement in ExerciseMediaSchema.migrateToV4) {
       await executor.execute(statement);
     }

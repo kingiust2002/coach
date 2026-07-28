@@ -1,6 +1,7 @@
 import '../domain/exercise_media.dart';
 
-typedef ExerciseDownloadProgress = void Function(int receivedBytes, int? totalBytes);
+typedef ExerciseDownloadProgress =
+    void Function(int receivedBytes, int? totalBytes);
 
 class DownloadedExerciseMedia {
   const DownloadedExerciseMedia({

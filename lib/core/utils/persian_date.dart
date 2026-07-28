@@ -1,7 +1,8 @@
 import 'package:shamsi_date/shamsi_date.dart';
 
 abstract final class PersianDate {
-  static Jalali toJalali(DateTime value) => Jalali.fromDateTime(value.toLocal());
+  static Jalali toJalali(DateTime value) =>
+      Jalali.fromDateTime(value.toLocal());
 
   static DateTime toUtcDate(Jalali value) {
     final Gregorian gregorian = value.toGregorian();

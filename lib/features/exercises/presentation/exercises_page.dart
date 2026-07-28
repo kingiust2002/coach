@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../domain/exercise.dart';
 import 'exercise_detail_page.dart';
 import 'exercise_form_page.dart';
+import 'exercise_media_controller.dart';
 import 'exercises_controller.dart';
 
 enum ExerciseStatusFilter {
@@ -24,9 +25,14 @@ enum ExerciseSourceFilter {
 }
 
 class ExercisesPage extends StatefulWidget {
-  const ExercisesPage({required this.controller, super.key});
+  const ExercisesPage({
+    required this.controller,
+    required this.mediaController,
+    super.key,
+  });
 
   final ExercisesController controller;
+  final ExerciseMediaController mediaController;
 
   @override
   State<ExercisesPage> createState() => _ExercisesPageState();
@@ -67,13 +73,30 @@ class _ExercisesPageState extends State<ExercisesPage> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: widget.controller,
+      animation: Listenable.merge(<Listenable>[
+        widget.controller,
+        widget.mediaController,
+      ]),
       builder: (BuildContext context, Widget? child) {
         final List<Exercise> filtered = _filteredExercises();
         return Scaffold(
           appBar: AppBar(
             title: const Text('کتابخانه حرکات'),
             actions: <Widget>[
+              IconButton(
+                tooltip: 'همگام‌سازی کتابخانه آنلاین',
+                onPressed:
+                    widget.mediaController.isSyncing ||
+                        !widget.mediaController.canSync
+                    ? null
+                    : _syncOnlineCatalog,
+                icon: widget.mediaController.isSyncing
+                    ? const SizedBox.square(
+                        dimension: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.cloud_sync_outlined),
+              ),
               IconButton(
                 tooltip: 'بازخوانی',
                 onPressed: widget.controller.isLoading
@@ -211,6 +234,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
                 builder: (BuildContext context) => ExerciseDetailPage(
                   exerciseId: exercise.id,
                   controller: widget.controller,
+                  mediaController: widget.mediaController,
                 ),
               ),
             ),
@@ -268,6 +292,24 @@ class _ExercisesPageState extends State<ExercisesPage> {
       .replaceAll(RegExp(r'\s+'), ' ')
       .trim()
       .toLowerCase();
+
+  Future<void> _syncOnlineCatalog() async {
+    try {
+      final int count = await widget.mediaController.syncCatalog();
+      await widget.controller.load();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$count حرکت از کتابخانه آنلاین به‌روز شد.')),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.toString())));
+      }
+    }
+  }
 
   Future<void> _createExercise() async {
     await Navigator.of(context).push(

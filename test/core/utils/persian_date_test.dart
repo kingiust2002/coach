@@ -8,6 +8,9 @@ void main() {
   });
 
   test('converts selected Jalali date back to UTC calendar date', () {
-    expect(PersianDate.toUtcDate(Jalali(1405, 1, 1)), DateTime.utc(2026, 3, 21));
+    expect(
+      PersianDate.toUtcDate(Jalali(1405, 1, 1)),
+      DateTime.utc(2026, 3, 21),
+    );
   });
 }

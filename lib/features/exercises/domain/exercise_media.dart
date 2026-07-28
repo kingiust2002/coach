@@ -81,7 +81,8 @@ class ExerciseMedia {
       videoSizeBytes: _nullableInt(map['videoSizeBytes']),
       durationSeconds: _nullableInt(map['durationSeconds']),
       version: _nullableInt(map['version']) ?? 1,
-      updatedAt: DateTime.tryParse(map['updatedAt']?.toString() ?? '')?.toUtc() ??
+      updatedAt:
+          DateTime.tryParse(map['updatedAt']?.toString() ?? '')?.toUtc() ??
           DateTime.now().toUtc(),
     );
   }

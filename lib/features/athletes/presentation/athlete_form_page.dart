@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 
 import '../../../core/utils/input_normalizer.dart';
+import '../../../core/utils/persian_date.dart';
 import '../../../shared/widgets/app_selection_field.dart';
 import '../domain/athlete.dart';
 import 'athletes_controller.dart';
@@ -464,19 +466,23 @@ class _AthleteFormPageState extends State<AthleteFormPage> {
   }
 
   Future<void> _pickBirthDate() async {
-    final DateTime today = DateTime.now();
-    final DateTime? picked = await showDatePicker(
+    final Jalali today = Jalali.now();
+    final Jalali initial = _birthDate == null
+        ? Jalali(today.year - 25, today.month, today.day)
+        : PersianDate.toJalali(_birthDate!);
+    final Jalali? picked = await showPersianDatePicker(
       context: context,
-      initialDate: _birthDate?.toLocal() ?? DateTime(today.year - 25),
-      firstDate: DateTime(1930),
+      initialDate: initial,
+      firstDate: Jalali(1309, 1, 1),
       lastDate: today,
       helpText: 'تاریخ تولد شاگرد',
       cancelText: 'انصراف',
       confirmText: 'انتخاب',
+      initialDatePickerMode: PersianDatePickerMode.year,
     );
     if (picked != null && mounted) {
       setState(() {
-        _birthDate = DateTime.utc(picked.year, picked.month, picked.day);
+        _birthDate = PersianDate.toUtcDate(picked);
         _dirty = true;
       });
     }
@@ -677,12 +683,7 @@ class _DateSelectionField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colors = Theme.of(context).colorScheme;
-    final DateTime? date = value?.toLocal();
-    final String label = date == null
-        ? 'ثبت نشده'
-        : '${date.year.toString().padLeft(4, '0')}/'
-              '${date.month.toString().padLeft(2, '0')}/'
-              '${date.day.toString().padLeft(2, '0')}';
+    final String label = PersianDate.format(value);
 
     return InkWell(
       borderRadius: BorderRadius.circular(18),
