@@ -5,6 +5,9 @@ import 'package:http/http.dart' as http;
 import '../domain/exercise.dart';
 import '../domain/exercise_media.dart';
 
+const String _defaultExerciseCatalogUrl =
+    'https://pub-b9ff919dee094104aea521394068477a.r2.dev/catalog/v1.json';
+
 class ExerciseCatalogSnapshot {
   const ExerciseCatalogSnapshot({
     required this.schemaVersion,
@@ -22,7 +25,11 @@ class ExerciseCatalogSnapshot {
 class ExerciseCatalogClient {
   ExerciseCatalogClient({String? manifestUrl, http.Client? client})
     : manifestUrl =
-          manifestUrl ?? const String.fromEnvironment('EXERCISE_CATALOG_URL'),
+          manifestUrl ??
+          const String.fromEnvironment(
+            'EXERCISE_CATALOG_URL',
+            defaultValue: _defaultExerciseCatalogUrl,
+          ),
       _client = client ?? http.Client();
 
   final String manifestUrl;
