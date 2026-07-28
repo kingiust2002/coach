@@ -2,23 +2,45 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/utils/id_generator.dart';
 import '../../../core/utils/input_normalizer.dart';
+import '../data/exercise_media_catalog.dart';
 import '../data/exercise_repository.dart';
+import '../data/exercise_video_store_base.dart';
 import '../domain/exercise.dart';
+import '../domain/exercise_media.dart';
 
 class ExercisesController extends ChangeNotifier {
-  ExercisesController(this._repository);
+  ExercisesController(
+    this._repository, {
+    ExerciseMediaCatalog? mediaCatalog,
+    ExerciseVideoStore? videoStore,
+  }) : _mediaCatalog = mediaCatalog ?? const EmptyExerciseMediaCatalog(),
+       _videoStore = videoStore ?? const UnsupportedExerciseVideoStore();
 
   final ExerciseRepository _repository;
+  final ExerciseMediaCatalog _mediaCatalog;
+  final ExerciseVideoStore _videoStore;
   final List<Exercise> _exercises = <Exercise>[];
+  final Map<String, ExerciseMedia> _mediaByExercise =
+      <String, ExerciseMedia>{};
+  final Map<String, ExerciseVideoDownload> _downloads =
+      <String, ExerciseVideoDownload>{};
+  final Map<String, double> _downloadProgress = <String, double>{};
+  final Map<String, Object> _mediaOperationErrors = <String, Object>{};
+  final Set<String> _mediaOperations = <String>{};
 
   bool _isLoading = false;
   bool _isMutating = false;
+  bool _isMediaLoading = false;
   Object? _error;
+  Object? _mediaError;
 
   List<Exercise> get exercises => List<Exercise>.unmodifiable(_exercises);
   bool get isLoading => _isLoading;
   bool get isMutating => _isMutating;
+  bool get isMediaLoading => _isMediaLoading;
+  bool get videoDownloadsSupported => _videoStore.canDownload;
   Object? get error => _error;
+  Object? get mediaError => _mediaError;
   int get activeCount =>
       _exercises.where((Exercise item) => item.isActive).length;
   int get archivedCount =>
@@ -27,6 +49,8 @@ class ExercisesController extends ChangeNotifier {
       _exercises.where((Exercise item) => item.isSystem).length;
   int get customCount =>
       _exercises.where((Exercise item) => !item.isSystem).length;
+  int get mediaCount => _mediaByExercise.length;
+  int get downloadedVideoCount => _downloads.length;
 
   Exercise? byId(String id) {
     for (final Exercise exercise in _exercises) {
@@ -36,6 +60,21 @@ class ExercisesController extends ChangeNotifier {
     }
     return null;
   }
+
+  ExerciseMedia? mediaFor(String exerciseId) =>
+      _mediaByExercise[exerciseId];
+
+  ExerciseVideoDownload? downloadFor(String exerciseId) =>
+      _downloads[exerciseId];
+
+  double? downloadProgressFor(String exerciseId) =>
+      _downloadProgress[exerciseId];
+
+  Object? mediaOperationErrorFor(String exerciseId) =>
+      _mediaOperationErrors[exerciseId];
+
+  bool isMediaOperationRunning(String exerciseId) =>
+      _mediaOperations.contains(exerciseId);
 
   Future<void> load() async {
     _setLoading(true);
@@ -47,10 +86,69 @@ class ExercisesController extends ChangeNotifier {
       _exercises
         ..clear()
         ..addAll(loaded);
+      await _loadMedia();
     } catch (error) {
       _error = error;
     } finally {
       _setLoading(false);
+    }
+  }
+
+  Future<void> refreshMedia() => _loadMedia(forceRefresh: true);
+
+  Future<void> downloadVideo(String exerciseId) async {
+    final ExerciseMedia? media = _mediaByExercise[exerciseId];
+    if (media == null) {
+      throw StateError('برای این حرکت ویدیویی منتشر نشده است.');
+    }
+    if (!_videoStore.canDownload) {
+      throw UnsupportedError('دانلود آفلاین در این محیط پشتیبانی نمی‌شود.');
+    }
+    if (_mediaOperations.contains(exerciseId)) {
+      return;
+    }
+
+    _mediaOperations.add(exerciseId);
+    _mediaOperationErrors.remove(exerciseId);
+    _downloadProgress[exerciseId] = 0;
+    notifyListeners();
+    try {
+      final ExerciseVideoDownload download = await _videoStore.download(
+        media,
+        onProgress: (double value) {
+          _downloadProgress[exerciseId] = value;
+          notifyListeners();
+        },
+      );
+      _downloads[exerciseId] = download;
+      _downloadProgress.remove(exerciseId);
+    } catch (error) {
+      _mediaOperationErrors[exerciseId] = error;
+      _downloadProgress.remove(exerciseId);
+      rethrow;
+    } finally {
+      _mediaOperations.remove(exerciseId);
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteDownloadedVideo(String exerciseId) async {
+    final ExerciseMedia? media = _mediaByExercise[exerciseId];
+    if (media == null || _mediaOperations.contains(exerciseId)) {
+      return;
+    }
+    _mediaOperations.add(exerciseId);
+    _mediaOperationErrors.remove(exerciseId);
+    notifyListeners();
+    try {
+      await _videoStore.delete(media);
+      _downloads.remove(exerciseId);
+    } catch (error) {
+      _mediaOperationErrors[exerciseId] = error;
+      rethrow;
+    } finally {
+      _mediaOperations.remove(exerciseId);
+      notifyListeners();
     }
   }
 
@@ -116,6 +214,41 @@ class ExercisesController extends ChangeNotifier {
     await _mutate(
       () => _repository.restore(exercise.id, DateTime.now().toUtc()),
     );
+  }
+
+  Future<void> _loadMedia({bool forceRefresh = false}) async {
+    _isMediaLoading = true;
+    _mediaError = null;
+    notifyListeners();
+    try {
+      final List<ExerciseMedia> loaded = await _mediaCatalog.load(
+        forceRefresh: forceRefresh,
+      );
+      _mediaByExercise
+        ..clear()
+        ..addEntries(
+          loaded.map(
+            (ExerciseMedia item) =>
+                MapEntry<String, ExerciseMedia>(item.exerciseId, item),
+          ),
+        );
+      await _refreshDownloadStates();
+    } catch (error) {
+      _mediaError = error;
+    } finally {
+      _isMediaLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> _refreshDownloadStates() async {
+    _downloads.clear();
+    for (final ExerciseMedia media in _mediaByExercise.values) {
+      final ExerciseVideoDownload? download = await _videoStore.locate(media);
+      if (download != null) {
+        _downloads[media.exerciseId] = download;
+      }
+    }
   }
 
   Future<void> _ensureUniqueName(String nameKey, {String? exceptId}) async {
