@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 
+import '../features/account/presentation/cloud_account_controller.dart';
 import '../features/athletes/data/athlete_repository.dart';
 import '../features/athletes/presentation/athletes_controller.dart';
 import '../features/dashboard/presentation/app_shell.dart';
@@ -36,6 +37,7 @@ class _CoachAppState extends State<CoachApp> {
   late final AthletesController _athletesController;
   late final ExercisesController _exercisesController;
   late final ExerciseMediaController _exerciseMediaController;
+  late final CloudAccountController _cloudAccountController;
 
   @override
   void initState() {
@@ -47,6 +49,7 @@ class _CoachAppState extends State<CoachApp> {
       mediaRepository: widget.exerciseMediaRepository,
       downloader: widget.exerciseMediaDownloader,
     );
+    _cloudAccountController = CloudAccountController();
     unawaited(_athletesController.load());
     unawaited(_exercisesController.load());
     unawaited(_exerciseMediaController.load());
@@ -57,6 +60,7 @@ class _CoachAppState extends State<CoachApp> {
     _athletesController.dispose();
     _exercisesController.dispose();
     _exerciseMediaController.dispose();
+    _cloudAccountController.dispose();
     super.dispose();
   }
 
@@ -83,6 +87,7 @@ class _CoachAppState extends State<CoachApp> {
           athletesController: _athletesController,
           exercisesController: _exercisesController,
           exerciseMediaController: _exerciseMediaController,
+          cloudAccountController: _cloudAccountController,
         ),
       ),
     );
