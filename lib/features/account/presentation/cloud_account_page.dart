@@ -106,10 +106,7 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
                 description: 'جلسه محلی حساب در حال بسته‌شدن است.',
               )
             else if (controller.isSignedIn)
-              _SignedInCard(
-                controller: controller,
-                onSignOut: _confirmSignOut,
-              )
+              _SignedInCard(controller: controller, onSignOut: _confirmSignOut)
             else if (controller.hasSession)
               _SessionRecoveryCard(
                 controller: controller,
@@ -170,7 +167,10 @@ class _SignInCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Text('ورود مربی', style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  'ورود مربی',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 const SizedBox(height: 8),
                 const Text(
                   'فقط حساب دارای نقش مربی یا مدیر اجازه اتصال به این اپ را دارد.',
@@ -224,7 +224,9 @@ class _SignInCard extends StatelessWidget {
                           : 'پنهان‌کردن رمز عبور',
                       onPressed: onTogglePassword,
                       icon: Icon(
-                        obscurePassword ? Icons.visibility : Icons.visibility_off,
+                        obscurePassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                     ),
                   ),
@@ -275,7 +277,9 @@ class _SignedInCard extends StatelessWidget {
               children: <Widget>[
                 CircleAvatar(
                   radius: 26,
-                  backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.primaryContainer,
                   child: const Icon(Icons.cloud_done_outlined),
                 ),
                 const SizedBox(width: 12),
@@ -283,7 +287,10 @@ class _SignedInCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(title, style: Theme.of(context).textTheme.titleMedium),
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                       Text(
                         controller.username.isEmpty
                             ? controller.email
@@ -409,7 +416,10 @@ class _OfflineSafetyCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text('وضعیت همگام‌سازی', style: TextStyle(fontWeight: FontWeight.w700)),
+            Text(
+              'وضعیت همگام‌سازی',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
             SizedBox(height: 8),
             Text(
               'ورود به حساب داده‌های محلی را خودکار آپلود نمی‌کند. تا تکمیل موتور Sync، اطلاعات فعلی فقط در SQLite گوشی باقی می‌مانند.',
@@ -443,7 +453,11 @@ class _InlineError extends StatelessWidget {
 }
 
 class _AccountRow extends StatelessWidget {
-  const _AccountRow({required this.label, required this.value, this.ltr = false});
+  const _AccountRow({
+    required this.label,
+    required this.value,
+    this.ltr = false,
+  });
 
   final String label;
   final String value;
@@ -494,7 +508,8 @@ class _UnavailableCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              _friendlyError(error) ?? 'برنامه در حالت آفلاین قابل استفاده است.',
+              _friendlyError(error) ??
+                  'برنامه در حالت آفلاین قابل استفاده است.',
               textAlign: TextAlign.center,
             ),
           ],

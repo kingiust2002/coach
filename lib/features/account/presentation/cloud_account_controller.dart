@@ -83,10 +83,7 @@ class CloudAccountController extends ChangeNotifier {
     final String normalizedEmail = email.trim().toLowerCase();
     if (!_looksLikeEmail(normalizedEmail)) {
       _setError(
-        const CloudAccountException(
-          'invalid_email',
-          'نشانی ایمیل معتبر نیست.',
-        ),
+        const CloudAccountException('invalid_email', 'نشانی ایمیل معتبر نیست.'),
       );
       return;
     }

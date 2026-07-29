@@ -151,8 +151,7 @@ class SupabaseCloudAccountService implements CloudAccountService {
       username: coachProfile?['username']?.toString() ?? '',
       displayName: coachProfile?['display_name']?.toString() ?? '',
       bio: coachProfile?['bio']?.toString() ?? '',
-      acceptingClients:
-          coachProfile?['accepting_clients'] as bool? ?? false,
+      acceptingClients: coachProfile?['accepting_clients'] as bool? ?? false,
     );
   }
 
