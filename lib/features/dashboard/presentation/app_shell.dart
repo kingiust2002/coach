@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../account/presentation/cloud_account_controller.dart';
+import '../../account/presentation/cloud_account_page.dart';
 import '../../athletes/presentation/athletes_controller.dart';
 import '../../athletes/presentation/athletes_page.dart';
 import '../../exercises/presentation/exercise_media_controller.dart';
@@ -11,12 +13,14 @@ class AppShell extends StatefulWidget {
     required this.athletesController,
     required this.exercisesController,
     required this.exerciseMediaController,
+    required this.cloudAccountController,
     super.key,
   });
 
   final AthletesController athletesController;
   final ExercisesController exercisesController;
   final ExerciseMediaController exerciseMediaController;
+  final CloudAccountController cloudAccountController;
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -46,11 +50,7 @@ class _AppShellState extends State<AppShell> {
             'پس از تکمیل ارزیابی شاگرد، برنامه‌ساز Draft به کتابخانه حرکات متصل می‌شود.',
         icon: Icons.assignment_outlined,
       ),
-      const _ComingSoon(
-        title: 'تنظیمات',
-        description: 'پشتیبان‌گیری و تبادل آفلاین در این بخش قرار می‌گیرد.',
-        icon: Icons.settings_outlined,
-      ),
+      CloudAccountPage(controller: widget.cloudAccountController),
     ];
 
     return Scaffold(
