@@ -113,7 +113,9 @@ class CloudAccountController extends ChangeNotifier {
       _profile = await _fetchAuthorizedProfile(auth);
       _phase = CloudAccountPhase.signedIn;
     } catch (error) {
-      await _clearRejectedSession();
+      if (_requiresSessionRejection(error)) {
+        await _clearRejectedSession();
+      }
       _error = error;
       _phase = CloudAccountPhase.signedOut;
     } finally {
@@ -158,6 +160,9 @@ class CloudAccountController extends ChangeNotifier {
       _profile = await _fetchAuthorizedProfile(_auth);
       _phase = CloudAccountPhase.signedIn;
     } catch (error) {
+      if (_requiresSessionRejection(error)) {
+        await _clearRejectedSession();
+      }
       _error = error;
       _phase = _profile == null
           ? CloudAccountPhase.signedOut
@@ -181,7 +186,9 @@ class CloudAccountController extends ChangeNotifier {
       if (request != _profileRequest) {
         return;
       }
-      await _clearRejectedSession();
+      if (_requiresSessionRejection(error)) {
+        await _clearRejectedSession();
+      }
       _error = error;
       _phase = CloudAccountPhase.signedOut;
     } finally {
@@ -285,6 +292,18 @@ class CloudAccountController extends ChangeNotifier {
     if (!_disposed) {
       notifyListeners();
     }
+  }
+
+  static bool _requiresSessionRejection(Object error) {
+    if (error is! CloudAccountException) {
+      return false;
+    }
+    return switch (error.code) {
+      'profile_missing' ||
+      'role_not_allowed' ||
+      'coach_profile_incomplete' => true,
+      _ => false,
+    };
   }
 
   static bool _sameUser(CloudAuthSnapshot left, CloudAuthSnapshot right) =>
