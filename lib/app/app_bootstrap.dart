@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/cloud/cloud_connection.dart';
 import 'app_dependencies.dart';
 import 'app_dependencies_mobile.dart'
     if (dart.library.html) 'app_dependencies_web.dart'
@@ -16,7 +17,10 @@ class AppBootstrap extends StatefulWidget {
 class _AppBootstrapState extends State<AppBootstrap> {
   late Future<AppDependencies> _initialization = _initialize();
 
-  Future<AppDependencies> _initialize() => platform.createAppDependencies();
+  Future<AppDependencies> _initialize() async {
+    await CloudConnection.initialize();
+    return platform.createAppDependencies();
+  }
 
   void _retry() {
     setState(() {
