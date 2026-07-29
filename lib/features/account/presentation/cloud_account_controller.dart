@@ -7,15 +7,15 @@ import '../../../core/cloud/cloud_connection.dart';
 
 class CloudAccountController extends ChangeNotifier {
   CloudAccountController({SupabaseClient? client})
-      : _client = client ?? CloudConnection.client {
+    : _client = client ?? CloudConnection.client {
     final SupabaseClient? availableClient = _client;
     if (availableClient != null) {
-      _authSubscription = availableClient.auth.onAuthStateChange.listen(
-        (AuthState state) {
-          _session = state.session;
-          unawaited(refreshProfile());
-        },
-      );
+      _authSubscription = availableClient.auth.onAuthStateChange.listen((
+        AuthState state,
+      ) {
+        _session = state.session;
+        unawaited(refreshProfile());
+      });
       _session = availableClient.auth.currentSession;
       unawaited(refreshProfile());
     }
@@ -42,10 +42,7 @@ class CloudAccountController extends ChangeNotifier {
   bool get acceptingClients =>
       _coachProfile?['accepting_clients'] as bool? ?? false;
 
-  Future<void> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signIn({required String email, required String password}) async {
     final SupabaseClient? client = _client;
     if (client == null) {
       _error = StateError('اتصال ابری در دسترس نیست.');

@@ -120,12 +120,11 @@ class _SignInCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Text(
-                'ورود مربی',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+              Text('ورود مربی', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 8),
-              const Text('با همان ایمیل و رمزی که در Supabase ساخته شده وارد شوید.'),
+              const Text(
+                'با همان ایمیل و رمزی که در Supabase ساخته شده وارد شوید.',
+              ),
               const SizedBox(height: 18),
               TextField(
                 controller: emailController,
@@ -250,7 +249,11 @@ class _SignedInCard extends StatelessWidget {
 }
 
 class _AccountRow extends StatelessWidget {
-  const _AccountRow({required this.label, required this.value, this.ltr = false});
+  const _AccountRow({
+    required this.label,
+    required this.value,
+    this.ltr = false,
+  });
 
   final String label;
   final String value;
@@ -301,7 +304,8 @@ class _UnavailableCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              _friendlyError(error) ?? 'برنامه در حالت آفلاین قابل استفاده است.',
+              _friendlyError(error) ??
+                  'برنامه در حالت آفلاین قابل استفاده است.',
               textAlign: TextAlign.center,
             ),
           ],

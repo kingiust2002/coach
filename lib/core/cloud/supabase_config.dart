@@ -1,8 +1,7 @@
 class SupabaseConfig {
   const SupabaseConfig._();
 
-  static const String _defaultUrl =
-      'https://legdlkbzcvkeudfuzzpy.supabase.co';
+  static const String _defaultUrl = 'https://legdlkbzcvkeudfuzzpy.supabase.co';
   static const String _defaultPublishableKey =
       'sb_publishable_dZgds8rFlS83OpF3AyvI8w_Zkr4cyjB';
 
