@@ -1,150 +1,304 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../core/cloud/cloud_connection.dart';
+import '../data/cloud_account_service.dart';
+
+enum CloudAccountPhase {
+  unavailable,
+  signedOut,
+  restoring,
+  signingIn,
+  signedIn,
+  signingOut,
+}
 
 class CloudAccountController extends ChangeNotifier {
-  CloudAccountController({SupabaseClient? client})
-    : _client = client ?? CloudConnection.client {
-    final SupabaseClient? availableClient = _client;
-    if (availableClient != null) {
-      _authSubscription = availableClient.auth.onAuthStateChange.listen((
-        AuthState state,
-      ) {
-        _session = state.session;
-        unawaited(refreshProfile());
-      });
-      _session = availableClient.auth.currentSession;
-      unawaited(refreshProfile());
+  CloudAccountController({CloudAccountService? service})
+    : _service = service ?? SupabaseCloudAccountService() {
+    if (!_service.isAvailable) {
+      _phase = CloudAccountPhase.unavailable;
+      _error = _service.initializationError;
+      return;
+    }
+
+    _authSubscription = _service.authChanges.listen(
+      _handleAuthSnapshot,
+      onError: _handleAuthStreamError,
+    );
+
+    final CloudAuthSnapshot initialAuth = _service.currentAuth;
+    _auth = initialAuth;
+    if (initialAuth.isSignedIn) {
+      _phase = CloudAccountPhase.restoring;
+      unawaited(_restoreProfile(initialAuth));
     }
   }
 
-  final SupabaseClient? _client;
-  StreamSubscription<AuthState>? _authSubscription;
-  Session? _session;
-  Map<String, dynamic>? _profile;
-  Map<String, dynamic>? _coachProfile;
-  bool _isBusy = false;
+  final CloudAccountService _service;
+  StreamSubscription<CloudAuthSnapshot>? _authSubscription;
+  CloudAuthSnapshot _auth = const CloudAuthSnapshot.signedOut();
+  CloudAccountProfile? _profile;
+  CloudAccountPhase _phase = CloudAccountPhase.signedOut;
   Object? _error;
+  bool _ignoreAuthEvents = false;
+  bool _disposed = false;
+  int _profileRequest = 0;
 
-  bool get isAvailable => _client != null;
-  bool get isBusy => _isBusy;
-  bool get isSignedIn => _session?.user != null;
-  Object? get error => _error ?? CloudConnection.initializationError;
-  String get email => _session?.user.email ?? '';
-  String get fullName => _profile?['full_name']?.toString() ?? '';
-  String get role => _profile?['role']?.toString() ?? '';
-  String get username => _coachProfile?['username']?.toString() ?? '';
-  String get displayName =>
-      _coachProfile?['display_name']?.toString() ?? fullName;
-  bool get acceptingClients =>
-      _coachProfile?['accepting_clients'] as bool? ?? false;
+  CloudAccountPhase get phase => _phase;
+  bool get isAvailable => _service.isAvailable;
+  bool get isBusy => switch (_phase) {
+    CloudAccountPhase.restoring ||
+    CloudAccountPhase.signingIn ||
+    CloudAccountPhase.signingOut => true,
+    _ => false,
+  };
+  bool get hasSession => _auth.isSignedIn;
+  bool get isSignedIn =>
+      _phase == CloudAccountPhase.signedIn && _profile != null;
+  bool get isAuthorizedCoach =>
+      _profile?.role == 'coach' || _profile?.role == 'admin';
+  Object? get error => _error ?? _service.initializationError;
+  String get email => _auth.email;
+  String get fullName => _profile?.fullName ?? '';
+  String get phone => _profile?.phone ?? '';
+  String get role => _profile?.role ?? '';
+  String get username => _profile?.username ?? '';
+  String get displayName {
+    final String coachDisplayName = _profile?.displayName ?? '';
+    if (coachDisplayName.isNotEmpty) {
+      return coachDisplayName;
+    }
+    return fullName;
+  }
+
+  String get bio => _profile?.bio ?? '';
+  bool get acceptingClients => _profile?.acceptingClients ?? false;
 
   Future<void> signIn({required String email, required String password}) async {
-    final SupabaseClient? client = _client;
-    if (client == null) {
-      _error = StateError('اتصال ابری در دسترس نیست.');
-      notifyListeners();
+    if (!isAvailable || isBusy) {
       return;
     }
 
     final String normalizedEmail = email.trim().toLowerCase();
-    if (normalizedEmail.isEmpty || password.isEmpty) {
-      _error = ArgumentError('ایمیل و رمز عبور را کامل وارد کنید.');
-      notifyListeners();
+    if (!_looksLikeEmail(normalizedEmail)) {
+      _setError(
+        const CloudAccountException(
+          'invalid_email',
+          'نشانی ایمیل معتبر نیست.',
+        ),
+      );
+      return;
+    }
+    if (password.isEmpty) {
+      _setError(
+        const CloudAccountException(
+          'missing_password',
+          'رمز عبور را وارد کنید.',
+        ),
+      );
       return;
     }
 
-    await _run(() async {
-      final AuthResponse response = await client.auth.signInWithPassword(
+    _phase = CloudAccountPhase.signingIn;
+    _error = null;
+    _notify();
+    _ignoreAuthEvents = true;
+    try {
+      final CloudAuthSnapshot auth = await _service.signIn(
         email: normalizedEmail,
         password: password,
       );
-      _session = response.session;
-      await _loadProfile(client);
-    });
+      _auth = auth;
+      _profile = await _fetchAuthorizedProfile(auth);
+      _phase = CloudAccountPhase.signedIn;
+    } catch (error) {
+      await _clearRejectedSession();
+      _error = error;
+      _phase = CloudAccountPhase.signedOut;
+    } finally {
+      _ignoreAuthEvents = false;
+      _notify();
+    }
   }
 
   Future<void> signOut() async {
-    final SupabaseClient? client = _client;
-    if (client == null) {
+    if (!isAvailable || !hasSession || isBusy) {
       return;
     }
 
-    await _run(() async {
-      await client.auth.signOut();
-      _session = null;
-      _profile = null;
-      _coachProfile = null;
-    });
+    _phase = CloudAccountPhase.signingOut;
+    _error = null;
+    _notify();
+    _ignoreAuthEvents = true;
+    try {
+      await _service.signOut();
+      _clearAccountState();
+      _phase = CloudAccountPhase.signedOut;
+    } catch (error) {
+      _error = error;
+      _phase = _profile == null
+          ? CloudAccountPhase.signedOut
+          : CloudAccountPhase.signedIn;
+    } finally {
+      _ignoreAuthEvents = false;
+      _notify();
+    }
   }
 
   Future<void> refreshProfile() async {
-    final SupabaseClient? client = _client;
-    if (client == null) {
-      notifyListeners();
+    if (!hasSession || isBusy) {
       return;
     }
 
-    final User? user = client.auth.currentUser;
-    _session = client.auth.currentSession;
-    if (user == null) {
-      _profile = null;
-      _coachProfile = null;
-      notifyListeners();
-      return;
-    }
-
-    await _run(() => _loadProfile(client));
-  }
-
-  Future<void> _loadProfile(SupabaseClient client) async {
-    final String? userId = client.auth.currentUser?.id;
-    if (userId == null) {
-      _profile = null;
-      _coachProfile = null;
-      return;
-    }
-
-    final Map<String, dynamic>? profile = await client
-        .from('profiles')
-        .select('id, role, full_name, phone')
-        .eq('id', userId)
-        .maybeSingle();
-    _profile = profile;
-
-    if (profile?['role'] == 'coach') {
-      _coachProfile = await client
-          .from('coach_profiles')
-          .select('username, display_name, bio, accepting_clients')
-          .eq('coach_id', userId)
-          .maybeSingle();
-    } else {
-      _coachProfile = null;
-    }
-  }
-
-  Future<void> _run(Future<void> Function() operation) async {
-    if (_isBusy) {
-      return;
-    }
-    _isBusy = true;
+    _phase = CloudAccountPhase.restoring;
     _error = null;
-    notifyListeners();
+    _notify();
     try {
-      await operation();
+      _profile = await _fetchAuthorizedProfile(_auth);
+      _phase = CloudAccountPhase.signedIn;
     } catch (error) {
       _error = error;
+      _phase = _profile == null
+          ? CloudAccountPhase.signedOut
+          : CloudAccountPhase.signedIn;
     } finally {
-      _isBusy = false;
+      _notify();
+    }
+  }
+
+  Future<void> _restoreProfile(CloudAuthSnapshot auth) async {
+    final int request = ++_profileRequest;
+    try {
+      final CloudAccountProfile profile = await _fetchAuthorizedProfile(auth);
+      if (request != _profileRequest || !_sameUser(auth, _auth)) {
+        return;
+      }
+      _profile = profile;
+      _error = null;
+      _phase = CloudAccountPhase.signedIn;
+    } catch (error) {
+      if (request != _profileRequest) {
+        return;
+      }
+      await _clearRejectedSession();
+      _error = error;
+      _phase = CloudAccountPhase.signedOut;
+    } finally {
+      _notify();
+    }
+  }
+
+  Future<CloudAccountProfile> _fetchAuthorizedProfile(
+    CloudAuthSnapshot auth,
+  ) async {
+    final String? userId = auth.userId;
+    if (userId == null) {
+      throw const CloudAccountException(
+        'missing_session',
+        'جلسه ورود معتبر نیست.',
+      );
+    }
+
+    final CloudAccountProfile? profile = await _service.fetchProfile(userId);
+    if (profile == null) {
+      throw const CloudAccountException(
+        'profile_missing',
+        'پروفایل این حساب در سامانه ساخته نشده است.',
+      );
+    }
+    if (profile.role != 'coach' && profile.role != 'admin') {
+      throw const CloudAccountException(
+        'role_not_allowed',
+        'این حساب مجوز ورود به اپ مربی را ندارد.',
+      );
+    }
+    if (profile.role == 'coach' && profile.username.isEmpty) {
+      throw const CloudAccountException(
+        'coach_profile_incomplete',
+        'پروفایل مربی کامل نیست.',
+      );
+    }
+    return profile;
+  }
+
+  void _handleAuthSnapshot(CloudAuthSnapshot auth) {
+    if (_disposed) {
+      return;
+    }
+    _auth = auth;
+    if (_ignoreAuthEvents) {
+      return;
+    }
+    if (!auth.isSignedIn) {
+      ++_profileRequest;
+      _clearAccountState();
+      _phase = CloudAccountPhase.signedOut;
+      _error = null;
+      _notify();
+      return;
+    }
+
+    _phase = CloudAccountPhase.restoring;
+    _error = null;
+    _notify();
+    unawaited(_restoreProfile(auth));
+  }
+
+  void _handleAuthStreamError(Object error, StackTrace stackTrace) {
+    if (_disposed) {
+      return;
+    }
+    _error = const CloudAccountException(
+      'auth_stream_error',
+      'به‌روزرسانی وضعیت حساب با خطا روبه‌رو شد.',
+    );
+    if (!hasSession) {
+      _phase = CloudAccountPhase.signedOut;
+    }
+    _notify();
+  }
+
+  Future<void> _clearRejectedSession() async {
+    ++_profileRequest;
+    try {
+      if (_service.currentAuth.isSignedIn || _auth.isSignedIn) {
+        await _service.signOut();
+      }
+    } catch (_) {
+      // The rejected account must never remain authorized in this controller.
+    }
+    _clearAccountState();
+  }
+
+  void _clearAccountState() {
+    _auth = const CloudAuthSnapshot.signedOut();
+    _profile = null;
+  }
+
+  void _setError(Object error) {
+    _error = error;
+    _notify();
+  }
+
+  void _notify() {
+    if (!_disposed) {
       notifyListeners();
     }
+  }
+
+  static bool _sameUser(CloudAuthSnapshot left, CloudAuthSnapshot right) =>
+      left.userId != null && left.userId == right.userId;
+
+  static bool _looksLikeEmail(String value) {
+    final int at = value.indexOf('@');
+    final int dot = value.lastIndexOf('.');
+    return at > 0 && dot > at + 1 && dot < value.length - 1;
   }
 
   @override
   void dispose() {
+    _disposed = true;
     unawaited(_authSubscription?.cancel());
     super.dispose();
   }
